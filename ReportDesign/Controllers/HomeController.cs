@@ -3,6 +3,7 @@
 namespace dotnetStudy.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(GroupName = "reportDesign")]
 [Route("[controller]")]
 public class HomeController : ControllerBase
 {
