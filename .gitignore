@@ -398,5 +398,12 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Watchlog
-Baize.ReportCenter/watchlogs.db
-Baize.ReportCenter/watchlogs-log.db
+Bi.Report/watchlogs.db
+Bi.Report/watchlogs-log.db
+
+# sparklog
+Bi.Report/sparkServer.log
+Bi.Report/sparkServer.log.*.gz
+
+
+
