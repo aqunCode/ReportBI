@@ -1,160 +1,160 @@
 ﻿using Bi.Core.Extensions;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Bi.Core.Redis;
-/// <summary>
-/// Redis connection pool.
-/// </summary>
-public class RedisConnectionPoolManager : IRedisConnectionPoolManager
+namespace Bi.Core.Redis
 {
-    private static readonly object _lock = new();
-    private readonly IConnectionMultiplexer[] _connections;
-    private readonly RedisConfiguration _redisConfiguration;
-    private readonly ILogger<RedisConnectionPoolManager> _logger;
-    private readonly Random _random = new();
-    private bool _disposed;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="RedisConnectionPoolManager"/> class.
+    /// Redis connection pool.
     /// </summary>
-    /// <param name="redisConfiguration">The redis configuration.</param>
-    /// <param name="logger">The logger.</param>
-    public RedisConnectionPoolManager(RedisConfiguration redisConfiguration, ILogger<RedisConnectionPoolManager> logger = null)
+    public class RedisConnectionPoolManager : IRedisConnectionPoolManager
     {
-        this._redisConfiguration = redisConfiguration ?? throw new ArgumentNullException(nameof(redisConfiguration));
-        this._logger = logger ?? NullLogger<RedisConnectionPoolManager>.Instance;
+        private static readonly object _lock = new();
+        private readonly IConnectionMultiplexer[] _connections;
+        private readonly RedisConfiguration _redisConfiguration;
+        private readonly ILogger<RedisConnectionPoolManager> _logger;
+        private readonly Random _random = new();
+        private bool _disposed;
 
-        if (this._connections.IsNullOrEmpty())
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisConnectionPoolManager"/> class.
+        /// </summary>
+        /// <param name="redisConfiguration">The redis configuration.</param>
+        /// <param name="logger">The logger.</param>
+        public RedisConnectionPoolManager(RedisConfiguration redisConfiguration, ILogger<RedisConnectionPoolManager> logger = null)
         {
-            lock (_lock)
+            this._redisConfiguration = redisConfiguration ?? throw new ArgumentNullException(nameof(redisConfiguration));
+            this._logger = logger ?? NullLogger<RedisConnectionPoolManager>.Instance;
+
+            if (this._connections.IsNullOrEmpty())
             {
-                if (this._connections.IsNullOrEmpty())
+                lock (_lock)
                 {
-                    this._connections = new IConnectionMultiplexer[redisConfiguration.PoolSize];
-                    this.EmitConnections();
+                    if (this._connections.IsNullOrEmpty())
+                    {
+                        this._connections = new IConnectionMultiplexer[redisConfiguration.PoolSize];
+                        this.EmitConnections();
+                    }
                 }
             }
         }
-    }
 
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <inheritdoc/>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-            return;
-
-        if (disposing)
+        /// <inheritdoc/>
+        public void Dispose()
         {
-            // free managed resources
-            foreach (var connection in this._connections)
-                connection?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        _disposed = true;
-    }
-
-    /// <inheritdoc/>
-    public IConnectionMultiplexer GetConnection()
-    {
-        var connection = _redisConfiguration.ConnectionSelectionStrategy switch
+        /// <inheritdoc/>
+        protected virtual void Dispose(bool disposing)
         {
-            ConnectionSelectionStrategy.Random => this._connections[_random.Next(0, _redisConfiguration.PoolSize)],
-            ConnectionSelectionStrategy.LeastLoaded => this._connections.OrderBy(x => x.GetCounters().TotalOutstanding).First(),
-            _ => throw new Exception(nameof(_redisConfiguration.ConnectionSelectionStrategy))
-        };
+            if (_disposed)
+                return;
 
-        _logger.LogDebug("Using redis connection(IConnectionMultiplexer) {0} with {1} outstanding!", connection.GetHashCode(), connection.GetCounters().TotalOutstanding);
-
-        return connection;
-    }
-
-    /// <inheritdoc/>
-    public ConnectionPoolInformation GetConnectionInformations()
-    {
-        var activeConnections = 0;
-        var invalidConnections = 0;
-
-        var activeConnectionHashCodes = new List<int>();
-        var invalidConnectionHashCodes = new List<int>();
-
-        foreach (var connection in _connections)
-        {
-            if (!connection.IsConnected)
+            if (disposing)
             {
-                invalidConnections++;
-                invalidConnectionHashCodes.Add(connection.GetHashCode());
-
-                continue;
+                // free managed resources
+                foreach (var connection in this._connections)
+                    connection?.Dispose();
             }
 
-            activeConnections++;
-            activeConnectionHashCodes.Add(connection.GetHashCode());
+            _disposed = true;
         }
 
-        return new ConnectionPoolInformation()
+        /// <inheritdoc/>
+        public IConnectionMultiplexer GetConnection()
         {
-            RequiredPoolSize = _redisConfiguration.PoolSize,
-            ActiveConnections = activeConnections,
-            InvalidConnections = invalidConnections,
-            ActiveConnectionHashCodes = activeConnectionHashCodes,
-            InvalidConnectionHashCodes = invalidConnectionHashCodes
-        };
-    }
-
-    private void EmitConnections()
-    {
-        for (var i = 0; i < this._redisConfiguration.PoolSize; i++)
-        {
-            IConnectionMultiplexer connection = null;
-
-            if (this._redisConfiguration.ConnectionString.IsNotNullOrEmpty())
-                connection = ConnectionMultiplexer.Connect(
-                    this._redisConfiguration.ConnectionString,
-                    this._redisConfiguration.Configure,
-                    this._redisConfiguration.ConnectLogger);
-
-            if (this._redisConfiguration.ConfigurationOptions != null)
-                connection = ConnectionMultiplexer.Connect(
-                    this._redisConfiguration.ConfigurationOptions,
-                    this._redisConfiguration.ConnectLogger);
-
-            if (connection == null)
-                throw new Exception($"Create the {i + 1} `IConnectionMultiplexer` connection fail");
-
-            if (this._redisConfiguration.RegisterConnectionEvent)
+            var connection = _redisConfiguration.ConnectionSelectionStrategy switch
             {
-                connection.ConnectionFailed +=
-                    (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{connection.GetHashCode()}) connection error {e.FailureType}.");
+                ConnectionSelectionStrategy.Random => this._connections[_random.Next(0, _redisConfiguration.PoolSize)],
+                ConnectionSelectionStrategy.LeastLoaded => this._connections.OrderBy(x => x.GetCounters().TotalOutstanding).First(),
+                _ => throw new Exception(nameof(_redisConfiguration.ConnectionSelectionStrategy))
+            };
 
-                connection.ConnectionRestored +=
-                    (s, e) => _logger.LogError($"Redis(hash:{connection.GetHashCode()}) connection error restored.");
+            _logger.LogDebug("Using redis connection(IConnectionMultiplexer) {0} with {1} outstanding!", connection.GetHashCode(), connection.GetCounters().TotalOutstanding);
 
-                connection.InternalError +=
-                    (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{connection.GetHashCode()}) internal error {e.Origin}.");
+            return connection;
+        }
 
-                connection.ErrorMessage +=
-                    (s, e) => _logger.LogError($"Redis(hash:{connection.GetHashCode()}) error: {e.Message}");
+        /// <inheritdoc/>
+        public ConnectionPoolInformation GetConnectionInformations()
+        {
+            var activeConnections = 0;
+            var invalidConnections = 0;
+
+            var activeConnectionHashCodes = new List<int>();
+            var invalidConnectionHashCodes = new List<int>();
+
+            foreach (var connection in _connections)
+            {
+                if (!connection.IsConnected)
+                {
+                    invalidConnections++;
+                    invalidConnectionHashCodes.Add(connection.GetHashCode());
+
+                    continue;
+                }
+
+                activeConnections++;
+                activeConnectionHashCodes.Add(connection.GetHashCode());
             }
 
-            connection.IncludeDetailInExceptions = true;
+            return new ConnectionPoolInformation()
+            {
+                RequiredPoolSize = _redisConfiguration.PoolSize,
+                ActiveConnections = activeConnections,
+                InvalidConnections = invalidConnections,
+                ActiveConnectionHashCodes = activeConnectionHashCodes,
+                InvalidConnectionHashCodes = invalidConnectionHashCodes
+            };
+        }
 
-            this._redisConfiguration.Action?.Invoke(connection);
+        private void EmitConnections()
+        {
+            for (var i = 0; i < this._redisConfiguration.PoolSize; i++)
+            {
+                IConnectionMultiplexer connection = null;
 
-            this._connections[i] = connection;
+                if (this._redisConfiguration.ConnectionString.IsNotNullOrEmpty())
+                    connection = ConnectionMultiplexer.Connect(
+                        this._redisConfiguration.ConnectionString,
+                        this._redisConfiguration.Configure,
+                        this._redisConfiguration.ConnectLogger);
+
+                if (this._redisConfiguration.ConfigurationOptions != null)
+                    connection = ConnectionMultiplexer.Connect(
+                        this._redisConfiguration.ConfigurationOptions,
+                        this._redisConfiguration.ConnectLogger);
+
+                if (connection == null)
+                    throw new Exception($"Create the {i + 1} `IConnectionMultiplexer` connection fail");
+
+                if (this._redisConfiguration.RegisterConnectionEvent)
+                {
+                    connection.ConnectionFailed +=
+                        (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{connection.GetHashCode()}) connection error {e.FailureType}.");
+
+                    connection.ConnectionRestored +=
+                        (s, e) => _logger.LogError($"Redis(hash:{connection.GetHashCode()}) connection error restored.");
+
+                    connection.InternalError +=
+                        (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{connection.GetHashCode()}) internal error {e.Origin}.");
+
+                    connection.ErrorMessage +=
+                        (s, e) => _logger.LogError($"Redis(hash:{connection.GetHashCode()}) error: {e.Message}");
+                }
+
+                connection.IncludeDetailInExceptions = true;
+
+                this._redisConfiguration.Action?.Invoke(connection);
+
+                this._connections[i] = connection;
+            }
         }
     }
 }
