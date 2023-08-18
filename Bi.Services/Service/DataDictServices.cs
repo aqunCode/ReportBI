@@ -12,7 +12,7 @@ public class DataDictServices : IDataDictServices {
     private SqlSugarScopeProvider repository;
 
     public DataDictServices(ISqlSugarClient _sqlSugarClient) {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
     }
 
     public async Task<IEnumerable<DataDict>> getEntityListAsync(DataDictInput input) {

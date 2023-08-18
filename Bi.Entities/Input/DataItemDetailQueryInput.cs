@@ -45,9 +45,4 @@ public class DataItemDetailQueryInput : BaseInput
     /// </summary>
     public string OrderBy { get; set; }
 
-    /// <summary>
-    /// 是否升序
-    /// </summary>
-    public OrderType OrderType { get; set; }
-
 }

@@ -29,7 +29,7 @@ public class ReportDashBoardServices : IReportDashBoardServices {
     /// </summary>
     public ReportDashBoardServices(ISqlSugarClient _sqlSugarClient, IDataCollectServices dataCollectServices)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dataCollectServices = dataCollectServices;
     }
 
@@ -46,7 +46,10 @@ public class ReportDashBoardServices : IReportDashBoardServices {
         ReportDashboardOutput reportDashboardOutput = reportDashboards.First().MapTo<ReportDashboardOutput>();
         List<ReportDashboardWidgetOutput> list = new List<ReportDashboardWidgetOutput>();
 
-        IEnumerable<ReportDashboardWidget> widgetList =  await repository.Queryable<ReportDashboardWidget>().Where(x => x.ReportCode == reportCode).ToListAsync();  
+        IEnumerable<ReportDashboardWidget> widgetList =  await repository.Queryable<ReportDashboardWidget>()
+            .Where(x => x.ReportCode == reportCode)
+            .OrderBy(x=> x.Sort, OrderByType.Asc)
+            .ToListAsync();  
         foreach (ReportDashboardWidget widget in widgetList)
         {
             ReportDashboardWidgetOutput output = new ReportDashboardWidgetOutput();
@@ -61,14 +64,14 @@ public class ReportDashBoardServices : IReportDashBoardServices {
             output.Options = widget.Options;
             list.Add(output);
         }
-
         reportDashboardOutput.Widgets = list;
         result.Dashboard = reportDashboardOutput;
         result.ReportCode = reportCode;
         return result;
     }
 
-    public async UnaryResult<(bool res, string msg)> insert(DashBoardInput input, bool master = true) {
+    public async UnaryResult<(bool res, string msg)> insert(DashBoardInput input, bool master = true) 
+    {
 
         string reportCode = input.ReportCode;
         bool isAdd = false; 
@@ -158,12 +161,14 @@ public class ReportDashBoardServices : IReportDashBoardServices {
 
             List<ReportDashboardWidgetInput> widgets = input.Widgets;
             List<ReportDashboardWidget> insertWidgets = new List<ReportDashboardWidget>();
+            int sort = 0;
             foreach (var widget in widgets)
             {
                 ReportDashboardWidget reportDashboardWidget = new ReportDashboardWidget();
                 string type = widget.Type;
                 ReportDashboardWidgetValue value = widget.Value;
                 reportDashboardWidget.Type = type;
+                reportDashboardWidget.Sort = sort++;
                 reportDashboardWidget.ReportCode = reportCode;
                 reportDashboardWidget.Setup = value.Setup != null ? Convert.ToString(value.Setup) : string.Empty;
                 reportDashboardWidget.Data = value.Data != null ? Convert.ToString(value.Data) : string.Empty;

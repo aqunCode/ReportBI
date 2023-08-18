@@ -5,7 +5,7 @@ namespace Bi.Entities.Entity;
 /// <summary>
 /// 数据集
 /// </summary>
-[SugarTable("BI_DATASET")]
+[SugarTable("bi_dataset")]
 public class BiDataset:BaseEntity
 {
     ///<summary>
@@ -27,7 +27,7 @@ public class BiDataset:BaseEntity
     ///<summary>
     ///是否删除
     ///</summary>
-    public string? DeleteFlag { set; get; } = "N";
+    public int DeleteFlag { set; get; } = 0;
     ///<summary>
     ///备用1
     ///</summary>
@@ -40,13 +40,5 @@ public class BiDataset:BaseEntity
     ///备用3
     ///</summary>
     public string? Opt3 { set; get; }
-    ///<summary>
-    ///备用4
-    ///</summary>
-    public string? Opt4 { set; get; }
-    ///<summary>
-    ///备用5
-    ///</summary>
-    public string? Opt5 { set; get; }
 }
 

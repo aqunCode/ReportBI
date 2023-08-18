@@ -88,6 +88,11 @@ namespace Bi.Core.Const
         /// 静态资源配置未找到
         /// </summary>
         public const double AssetsOptionsNotFound = 10004.3;
+
+        /// <summary>
+        /// 模糊查询后缀
+        /// </summary>
+        public static char Suffix = '∞';
     }
 
 }

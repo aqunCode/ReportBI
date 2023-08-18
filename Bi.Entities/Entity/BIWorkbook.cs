@@ -4,7 +4,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable("BI_WORKBOOK")]
+[SugarTable("bi_workbook")]
 [MessagePackObject(true)]
 public class BIWorkbook : BaseEntity
 {
@@ -59,13 +59,11 @@ public class BIWorkbook : BaseEntity
     public string? Opt2 { get; set; }
    
     public string? Opt3 { get; set; }
-    
-    public string? Opt4 { get; set; }
     /// <summary>
     /// 是否已经删除
     /// </summary>
-    public string DeleteFlag { get; set; }
+    public int DeleteFlag { get; set; }
 
-    public BIWorkbook() => DeleteFlag = "N";
+    public BIWorkbook() => DeleteFlag = 0;
 
 }

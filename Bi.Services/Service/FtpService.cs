@@ -7,6 +7,16 @@ using FluentFTP;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using System.Net;
+using SixLabors.ImageSharp;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Bmp;
+using SixLabors.ImageSharp.Formats.Tga;
 
 namespace Bi.Services.Service;
 
@@ -22,33 +32,63 @@ public class FtpService : IFtpService {
     public FtpService(ISqlSugarClient _sqlSugarClient
                        , ILogger<FtpService> logger)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.logger = logger;
     }
 
     public async Task<FtpImageInput> upLoadImage(FtpImageInput input)
     {
-        var ftpDirectory = $"/Alan/autoReport";
-        IFtpClient ftpClient = null;
-        var host = "ftp://10.191.16.30"; //configuration.GetValue<string>("AutoFtpClient:Host");
-        var user = "mesadmin";//configuration.GetValue<string>("AutoFtpClient:User");
-        var pass = "Luxshare@2022";//configuration.GetValue<string>("AutoFtpClient:Password");
-        ftpClient = new FtpClient(host, user, pass);
-        if (!(await ftpClient.DirectoryExistsAsync(ftpDirectory)))
-            await ftpClient.CreateDirectoryAsync(ftpDirectory);
-        int index = input.Data.FileName.LastIndexOf('.');
-        var ImageName = $"autoReport_{Guid.NewGuid()}{input.Data.FileName.Substring(index)}";
-        var ms = new MemoryStream();
-        await input.Data.CopyToAsync(ms);
-        //imagePath.Append($@"{ftpDirectory}/{AfterCuringImageName},");
-        FtpStatus res = await ftpClient.UploadAsync(ms, ftpDirectory + "/" + ImageName, FtpRemoteExists.Overwrite);
-        await ftpClient.DisconnectAsync();
-        string ip = getLocalIp();
+        var imageFile = input.Data;
+        if (imageFile == null)
+        {
+            throw new Exception("请选择要上传的图片！");
+        }
+
+        var imageName = $"autoReport_{Path.GetRandomFileName()}{Path.GetExtension(imageFile.FileName)}";
+        var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "image");
+        if (!Directory.Exists(filePath))
+        {
+            Directory.CreateDirectory(filePath);
+        }
+        var imagePath = Path.Combine(filePath, imageName);
+
+        using (var stream = imageFile.OpenReadStream())
+        using (var image = Image.Load(stream))
+        {
+            image.Mutate(x => x.BackgroundColor(Color.Transparent)); // 设置背景色为透明
+
+            //var encoder = new PngEncoder();
+            var encoder = getEncoder(Path.GetExtension(imageFile.FileName));
+            image.Save(imagePath, encoder);
+        }
+        string ip = "localhost";
+        // string ip = getLocalIp();
         return new FtpImageInput
         {
-            Url = "http://" + ip + ":8700/api/autoreportcenter/v1/ftpfile/showimage/showimage/" + ImageName
+            Url = "http://" + ip + ":8700/ftpfile/showimage/showimage/" + imageName
         };
     }
+
+    private IImageEncoder getEncoder(string extension)
+    {
+        switch (extension.ToLower())
+        {
+            case ".tga":
+                return new TgaEncoder();
+            case ".bmp":
+                return new BmpEncoder();
+            case ".png":
+                return new PngEncoder();
+            case ".jpg":
+            case ".jpeg":
+                return new JpegEncoder();
+            case ".gif":
+                return new GifEncoder();
+            default:
+                return new PngEncoder();
+        }
+    }
+
     private string getLocalIp()
     {
         string hostName = Dns.GetHostName();
@@ -59,24 +99,11 @@ public class FtpService : IFtpService {
         return "localhost";
     }
 
-    public async Task<MemoryStream> showImage(string imageId)
+    public async Task<string> showImage(string imageId)
     {
-        string url = "/Alan/autoReport/" + imageId;
-        IFtpClient ftpClient = null;
-        var host = "ftp://10.191.16.30"; //configuration.GetValue<string>("AutoFtpClient:Host");
-        var user = "mesadmin";//configuration.GetValue<string>("AutoFtpClient:User");
-        var pass = "Luxshare@2022";//configuration.GetValue<string>("AutoFtpClient:Password");
-
-        ftpClient = new FtpClient(host, user, pass);
-        await ftpClient.ConnectAsync();
-        var ms = new MemoryStream();
-        await ftpClient.DownloadAsync(ms, url);
-        byte[] bytes = new byte[ms.Length];
-        ms.Read(bytes, 0, bytes.Length);
-        ms.Seek(0, SeekOrigin.Begin);
-        /*IImageFormat format;
-        Image image = Image.Load(ms,out format);*/
-        return ms;
+        string ip = getLocalIp();
+        var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "image", imageId);
+        return filePath;
     }
 
     public async Task<string> insertCanvas(Base64ImageInput input)

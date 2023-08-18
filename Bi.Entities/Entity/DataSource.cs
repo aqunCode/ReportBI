@@ -5,7 +5,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable("auto_data_source")]
+[SugarTable("bi_data_source")]
 [MessagePackObject(true)]
 public class DataSource  : BaseEntity{
     /// <summary>

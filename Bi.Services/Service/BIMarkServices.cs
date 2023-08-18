@@ -43,7 +43,7 @@ public class BIMarkServices : IBIMarkServices
                                 , IBinaryTreeServices binaryTreeServices
                                 , DataSourceServices dataSourceService)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dbEngineServices = dbService;
         this.syntaxServices = syntaxServices;
         this.binaryTreeServices = binaryTreeServices;
@@ -131,7 +131,7 @@ public class BIMarkServices : IBIMarkServices
         string functionStr;
         string groupBy = "";
         //获取数据源  datasetId ==> datasource
-        var dataSet = await repository.Queryable<BiDataset>().FirstAsync(x => x.Id == input.MarkField.DatasetId && x.DeleteFlag == "N");
+        var dataSet = await repository.Queryable<BiDataset>().FirstAsync(x => x.Id == input.MarkField.DatasetId && x.DeleteFlag == 0);
         var dataSource = await repository.Queryable<DataSource>().FirstAsync(x => x.SourceCode == dataSet.SourceCode && x.DeleteFlag == 0);
         
         // 创建数据库链接
@@ -142,8 +142,8 @@ public class BIMarkServices : IBIMarkServices
         switch (input.MarkField.ColumnType)
         {
             case "1":
-                var field = await repository.Queryable<BiCustomerField>().FirstAsync(x => x.Id == input.MarkField.NodeId && x.DeleteFlag == "N");
-                node = await repository.Queryable<BiDatasetNode>().FirstAsync(x => x.NodeLabel == input.MarkField.LabelName && x.DeleteFlag == "N");
+                var field = await repository.Queryable<BiCustomerField>().FirstAsync(x => x.Id == input.MarkField.NodeId && x.DeleteFlag == 0);
+                node = await repository.Queryable<BiDatasetNode>().FirstAsync(x => x.NodeLabel == input.MarkField.LabelName && x.DeleteFlag == 0);
             
                 if (field.TypeConvert == 0) // 维度转指标
                     functionStr = dbEngineServices.showFunction("toNumber", dataSource.SourceType);
@@ -190,14 +190,14 @@ public class BIMarkServices : IBIMarkServices
                 }
                 else
                 {
-                    node = await repository.Queryable<BiDatasetNode>().FirstAsync(x => x.NodeLabel == input.MarkField.LabelName && x.DeleteFlag == "N");
+                    node = await repository.Queryable<BiDatasetNode>().FirstAsync(x => x.NodeLabel == input.MarkField.LabelName && x.DeleteFlag == 0);
                     tableName = node.TableName;
                     functionStr = res.Item1;
                     tableRename = input.MarkField.LabelName.Replace(".", "").Replace("(", "").Replace(")", "");
                 }
                 break;
             default:
-                node = await repository.Queryable<BiDatasetNode>().FirstAsync(x => x.Id == input.MarkField.NodeId && x.DeleteFlag == "N");
+                node = await repository.Queryable<BiDatasetNode>().FirstAsync(x => x.Id == input.MarkField.NodeId && x.DeleteFlag == 0);
                 tableName = node.TableName;
                 tableRename = input.MarkField.LabelName.Replace(".", "").Replace("(", "").Replace(")", "");
                 functionStr = string.Concat(tableRename,".",input.MarkField.ColumnName);

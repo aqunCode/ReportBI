@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bi.Core.Const
+namespace Bi.Core.Const;
+
+public static class CacheName
 {
-    public static class CacheName
-    {
-    }
 }

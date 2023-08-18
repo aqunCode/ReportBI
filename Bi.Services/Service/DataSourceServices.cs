@@ -23,6 +23,7 @@ using Dapper;
 using SqlSugar;
 using System.Linq;
 using Bi.Core.Const;
+using static MongoDB.Driver.WriteConcern;
 
 public class DataSourceServices : IDataSourceServices {
     /// <summary>
@@ -40,7 +41,7 @@ public class DataSourceServices : IDataSourceServices {
     public DataSourceServices(ISqlSugarClient _sqlSugarClient,
                                 IDbEngineServices dbEngineService
                                 ) {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         dbEngine = dbEngineService;
     }
 
@@ -54,7 +55,8 @@ public class DataSourceServices : IDataSourceServices {
         return await repository.Insertable(entity).ExecuteCommandAsync();
     }
 
-    public async UnaryResult<PageEntity<IEnumerable<DataSource>>> getEntityListAsync(PageEntity<DataSourceInput> inputs) {
+    public async UnaryResult<PageEntity<IEnumerable<DataSource>>> getEntityListAsync(PageEntity<DataSourceInput> inputs) 
+    {
         
         var condition = this.GetEntityExpression(inputs.Data);
         //分页查询
@@ -462,6 +464,19 @@ public class DataSourceServices : IDataSourceServices {
                 await Task.Run(() =>
                {
                     data = items.Item1.Ado.GetDataTable(sql);
+                    if(dbTest.SourceType == "SqlServer")
+                   {
+                       DataTable dtResult = data.Clone();
+                       // 解锁 DataTable 
+                       DataTableHelper.unLockReadOnly(dtResult);
+                       var startIndex = data.Rows.Count > (dbTest.LimitEnd - dbTest.LimitStart) ? 
+                                            data.Rows.Count - (dbTest.LimitEnd - dbTest.LimitStart) : 0;
+                       // 遍历获取后十笔数据
+                       for (int i = startIndex; i < data.Rows.Count; i++)
+                           dtResult.Rows.Add(data.Rows[i].ItemArray);
+                       data = dtResult;
+                   }
+
                });
         }
         // 释放查询缓存

@@ -9,7 +9,7 @@ namespace Bi.Entities.Entity;
 /// 创建日期：7/4/2023 3:58:57 PM
 /// 版本：1.1
 /// </summary>
-[SugarTable("BI_COLLECT")]
+[SugarTable("bi_collect")]
 public class BiCollect:BaseEntity
 {
 
@@ -32,6 +32,6 @@ public class BiCollect:BaseEntity
 	///<summary>
 	///OPT2
 	///</summary>
-	public string? Opt2  { set; get;} 
+	public string? Opt1 { set; get;} 
 }
 

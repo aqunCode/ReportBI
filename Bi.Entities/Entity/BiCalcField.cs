@@ -8,7 +8,7 @@ namespace Bi.Entities.Entity;
 /// 创建日期：2023/1/9 15:38:50
 /// 版本：1.1
 /// </summary>
-[SugarTable("BI_CALC_FIELD")]
+[SugarTable("bi_calc_field")]
 public class BiCalcField:BaseEntity
 {
 
@@ -86,12 +86,8 @@ public class BiCalcField:BaseEntity
 	///</summary>
 	public string? Opt3  { set; get;} 
 	///<summary>
-	///OPT4
-	///</summary>
-	public string? Opt4  { set; get;} 
-	///<summary>
 	///DELETEFLAG
 	///</summary>
-	public string? DeleteFlag  { set; get;} 
+	public int DeleteFlag  { set; get;} 
 }
 

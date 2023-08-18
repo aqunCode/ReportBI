@@ -4,7 +4,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable("auto_report_dashboard")]
+[SugarTable("bi_report_dashboard")]
 [MessagePackObject(true)]
 public class ReportDashboard : BaseEntity
 {

@@ -31,15 +31,24 @@ public class DataCollectServices : IDataCollectServices {
     /// datasource 服务接口
     /// </summary>
     private readonly IDataSourceServices dataSourceService;
+    /// <summary>
+    /// 数据字典服务
+    /// </summary>
+    private readonly IDataItemDetailService dataItemDetailService;
 
-    public DataCollectServices(ISqlSugarClient _sqlSugarClient, IDataSourceServices service, ILogger<DataCollectServices> logger) {
+    public DataCollectServices( ISqlSugarClient _sqlSugarClient,
+                                IDataSourceServices service, 
+                                ILogger<DataCollectServices> logger,
+                                IDataItemDetailService dataItemDetailService) {
 
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dataSourceService = service;
         this.logger = logger;
+        this.dataItemDetailService = dataItemDetailService;
     }
 
-    public async UnaryResult<double> addAsync(DataCollectInput input) {
+    public async UnaryResult<double> addAsync(DataCollectInput input) 
+    {
 
         var inputentitys = await repository.Queryable<DataCollect>().Where(x => x.SetCode == input.SetCode).ToListAsync();
         if(inputentitys.Any())
@@ -56,7 +65,8 @@ public class DataCollectServices : IDataCollectServices {
         repository.Insertable(entity).ExecuteCommand();
         return BaseErrorCode.Successful;
     }
-    public async UnaryResult<double> deleteAsync(DataCollectDelete input) {
+    public async UnaryResult<double> deleteAsync(DataCollectDelete input) 
+    {
         int i = -1;
         foreach(String setCode in input.SetCode) {
             var inputentitys = (await repository.Queryable<DataCollect>().Where(x => x.SetCode == setCode && x.DeleteFlag == 0).ToListAsync());
@@ -95,11 +105,16 @@ public class DataCollectServices : IDataCollectServices {
 
     public async Task<IEnumerable<DataSourceName>> getAllDataSource(DataSourceName input) {
         IEnumerable<DataSource> list;
-        var dt = repository.Ado.GetDataTable(@"
-        SELECT sdd2.DETAILCODE FROM GITEA.SYS_DATAITEM sdd
-        LEFT JOIN GITEA.SYS_DATAITEM_DETAIL sdd2 ON sdd.ID = sdd2.ITEMID
-        WHERE sdd.ITEMCODE = 'dataSource'");
-        var arr = dt.Select().Select(x => x["DETAILCODE"].ToString()).ToArray();
+
+        var dataItem = await dataItemDetailService.GetListAsync(
+            new DataItemDetailQueryInput
+            {
+                Enabled = 1,
+                ItemCode = "dataSource",
+                OrderBy = "sortCode"
+            });
+        var arr = dataItem.Select(x => x.DetailCode).ToArray();
+
         //String[] arr = new string[] { "MySql", "Oracle", "PostgreSql", "SqlServer", "Sqlite" };
         if(input.SourceType == "http")
             list = await repository.Queryable<DataSource>().Where(x => x.SourceType == input.SourceType && x.DeleteFlag == 0).ToListAsync();

@@ -8,7 +8,7 @@ namespace Bi.Entities.Entity;
 /// 创建日期：2023/1/9 15:37:11
 /// 版本：1.1
 /// </summary>
-[SugarTable("BI_FILTER_FIELD")]
+[SugarTable("bi_filter_field")]
 public class BiFilterField:BaseEntity
 {
 
@@ -47,7 +47,7 @@ public class BiFilterField:BaseEntity
     ///<summary>
     ///ORDERBY
     ///</summary>
-    public decimal OrderBy { set; get; }
+    public int OrderBy { set; get; }
     ///<summary>
     ///OPT1
     ///</summary>
@@ -61,12 +61,8 @@ public class BiFilterField:BaseEntity
 	///</summary>
 	public string? Opt3  { set; get;} 
 	///<summary>
-	///OPT4
-	///</summary>
-	public string? Opt4  { set; get;} 
-	///<summary>
 	///DELETEFLAG
 	///</summary>
-	public string? DeleteFlag  { set; get;} 
+	public int? DeleteFlag  { set; get;} 
 }
 

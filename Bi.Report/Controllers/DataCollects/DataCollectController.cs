@@ -26,11 +26,15 @@ public class DataCollectController : BaseController {
     /// </summary>
     private readonly IDataCollectServices service;
 
+    
+
 
     /// <summary>
     /// DataCollect 构造函数
     /// </summary>
-    public DataCollectController(IDataCollectServices service,ILogger<DataCollectController> logger) {
+    public DataCollectController(IDataCollectServices service,
+                                ILogger<DataCollectController> logger)
+    {
         this.service = service;
         this.logger = logger;
     }

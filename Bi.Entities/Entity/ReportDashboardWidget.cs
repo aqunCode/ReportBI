@@ -4,7 +4,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable("auto_report_dashboard_widget")]
+[SugarTable("bi_report_dashboard_widget")]
 [MessagePackObject(true)]
 public class ReportDashboardWidget : BaseEntity
 {
@@ -22,11 +22,11 @@ public class ReportDashboardWidget : BaseEntity
 
     public string? Options { get; set; }
 
-    public Int32 RefreshSeconds { get; set; }
+    public int RefreshSeconds { get; set; }
 
-    private Int16 EnableFlag { get; set; }
+    private int EnableFlag { get; set; }
 
-    public Int32 DeleteFlag { get; set; }
+    public int DeleteFlag { get; set; }
 
-    public Int32 Sort { get; set; }
+    public int Sort { get; set; }
 }

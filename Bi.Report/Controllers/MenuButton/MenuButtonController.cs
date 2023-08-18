@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Bi.Services.IService;
 using Bi.Entities.Response;
 using Bi.Core.Extensions;
+using Bi.Entities.Input;
 
 namespace Bi.Report.Controllers.MenuButton;
 
@@ -48,5 +49,25 @@ public class MenuButtonController : BaseController
         return Success(data);
     }
 
+    /// <summary>
+    /// 分页获取菜单、按钮
+    /// </summary>
+    /// <param name="input">分页查询参数</param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("getpagelisttree")]
+    public async Task<ResponseResult<PageEntity<IEnumerable<MenuButtonResponse>>>> GetPageListTreeAsync(PageEntity<MenuButtonQueryInput> input)
+    {
+        input.Data ??= new MenuButtonQueryInput();
+        input.Data.CurrentUser = this.CurrentUser;
+        var result = await menuButtonService.GetPageListTreeAsync(input);
+        if (result?.Data?.Count() > 0)
+        {
+            result.Data = result.Data
+                            .TreeToJson("Id", new[] { input.Data.ParentId.IsNullOrEmpty() ? "0" : input.Data.ParentId }, childName: "children")
+                            .ToObject<IEnumerable<MenuButtonResponse>>();
+        }
+        return Success(result);
+    }
 
 }

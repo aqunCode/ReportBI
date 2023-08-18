@@ -44,7 +44,7 @@ public class BIWorkbookServices : IBIWorkbookServices
                                 , IDbEngineServices dbService
                                 , IBIMarkServices markServices)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.rService = service;
         this.filterServices = filterServices;
         this.aggregationServices = aggregationServices;
@@ -57,7 +57,7 @@ public class BIWorkbookServices : IBIWorkbookServices
     public async Task<string> addAsync(BIWorkbookInput input)
     {
         input.MarkItems = input.MarkItems ?? new List<BiMarkField>();
-        var inputentitys = await repository.Queryable<BIWorkbook>().Where(x => x.WorkBookCode == input.WorkBookCode && x.DeleteFlag == "N").ToListAsync();
+        var inputentitys = await repository.Queryable<BIWorkbook>().Where(x => x.WorkBookCode == input.WorkBookCode && x.DeleteFlag == 0).ToListAsync();
         if (inputentitys.Any())
             return "请勿重复插入！";
 
@@ -118,7 +118,7 @@ public class BIWorkbookServices : IBIWorkbookServices
             return "ERROR 工作簿ID不存在";
         }
         set.Modify(input.Id,input.CurrentUser);
-        set.DeleteFlag = "Y";
+        set.DeleteFlag = 1;
 
         var deleteCalists = await repository.Queryable<BiCalcField>()
                .WhereIF(
@@ -135,17 +135,17 @@ public class BIWorkbookServices : IBIWorkbookServices
 
         foreach (var item in deleteCalists)
         {
-            item.DeleteFlag = "Y";
+            item.DeleteFlag = 1;
             item.Modify(item.Id,input.CurrentUser);
         }
         foreach (var item in deleteFilists)
         {
-            item.DeleteFlag = "Y";
+            item.DeleteFlag = 1;
             item.Modify(item.Id, input.CurrentUser);
         }
         foreach (var item in deleteMarklists)
         {
-            item.DeleteFlag = "Y";
+            item.DeleteFlag = 1;
             item.Modify(item.Id, input.CurrentUser);
         }
 
@@ -179,7 +179,7 @@ public class BIWorkbookServices : IBIWorkbookServices
                 x => x.Id.Contains(input.Id))
             .WhereIF(
                 true,
-                x => x.DeleteFlag == "N")
+                x => x.DeleteFlag == 0)
             .WhereIF(input.NodeId.IsNotNullOrEmpty(), t => t.Opt2 == input.NodeId)
             .WhereIF(input.WorkBookName.IsNotNullOrEmpty(), t => t.WorkBookName == input.WorkBookName)
             .WhereIF(input.WorkBookCode.IsNotNullOrEmpty(), t => t.WorkBookCode == input.WorkBookCode)
@@ -240,7 +240,7 @@ public class BIWorkbookServices : IBIWorkbookServices
                 x => x.WorkBookName.Contains(input.WorkBookName))
             .WhereIF(
                 true,
-                x => x.DeleteFlag == "N")
+                x => x.DeleteFlag == 0)
             .WhereIF(
                 input.Opt3.IsNotNullOrEmpty(), 
                 t => t.Opt3 == input.Opt3)
@@ -273,7 +273,7 @@ public class BIWorkbookServices : IBIWorkbookServices
         {
             return "工作簿编码不能为空！";
         }
-        var inputentitys = await repository.Queryable<BIWorkbook>().Where(x => x.WorkBookCode == input.WorkBookCode && x.DeleteFlag == "N" && x.Id != input.Id).ToListAsync();
+        var inputentitys = await repository.Queryable<BIWorkbook>().Where(x => x.WorkBookCode == input.WorkBookCode && x.DeleteFlag == 0 && x.Id != input.Id).ToListAsync();
         if (inputentitys.Any())
             return "工作簿编码重复！";
 

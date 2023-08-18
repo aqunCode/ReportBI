@@ -82,7 +82,7 @@ public class UserController : BaseController
         return this.Success(retval);
     }
 
-    /*/// <summary>
+    /// <summary>
     /// 获取用户头像
     /// </summary>
     /// <param name="fileName"></param>
@@ -102,6 +102,6 @@ public class UserController : BaseController
             return BadRequest();
 
         return File(pictureBytes, contentType, data);
-    }*/
+    }
 }
 

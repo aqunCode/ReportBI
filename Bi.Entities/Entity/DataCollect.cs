@@ -5,7 +5,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable("auto_data_collect")]
+[SugarTable("bi_data_collect")]
 [MessagePackObject(true)]
 public class DataCollect : BaseEntity{
     /*/// <summary>

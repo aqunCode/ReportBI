@@ -4,7 +4,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable("auto_report")]
+[SugarTable("bi_report")]
 [MessagePackObject(true)]
 public class AutoReport : BaseEntity
 {
@@ -47,11 +47,6 @@ public class AutoReport : BaseEntity
     /// 下载次数
     /// </summary>
     public int DownloadCount { get; set; }
-
-    /// <summary>
-    /// 0--已禁用 1--已启用  DIC_NAME=ENABLE_FLAG
-    /// </summary>
-    public int EnableFlag { get; set; }
 
     /// <summary>
     /// 0--未删除 1--已删除 DIC_NAME=DELETE_FLAG

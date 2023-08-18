@@ -1,6 +1,7 @@
 ﻿using Bi.Core.Models;
 using Bi.Entities.Input;
 using Bi.Services.IService;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,10 +30,18 @@ internal class UserService : IUserService
             RoleIds = "a,b,c,d,e",
             CompanyIds = "hostar",
             DepartmentIds = "it",
-            HeadIcon = "coin",
+            HeadIcon = "coin.jpg",
             LastPasswordChangeTime = DateTime.Now,
             Source = 1
         };
         return user;
+    }
+
+    public async Task<(string fileName, byte[] datas)> GetPictureAsync(string fileName)
+    {
+        string rootPath = AppContext.BaseDirectory;
+        rootPath = Path.Combine(rootPath, "picture",fileName);
+        byte[] fileBytes = File.ReadAllBytes(rootPath);
+        return (fileName, fileBytes);
     }
 }

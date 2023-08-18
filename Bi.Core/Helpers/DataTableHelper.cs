@@ -49,5 +49,17 @@ public class DataTableHelper
     {
         return orderRow.CopyToDataTable();
     }
+
+    /// <summary>
+    /// 解锁DataTable 字段只读状态
+    /// </summary>
+    /// <param name="dt"></param>
+    public static void unLockReadOnly(DataTable dt)
+    {
+        for (int i = 0; i < dt.Columns.Count; i++)
+        {
+            dt.Columns[dt.Columns[i].ColumnName].ReadOnly = false;
+        }
+    }
 }
 

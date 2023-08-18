@@ -24,7 +24,7 @@ public class ReportService : IReportService
     /// </summary>
     public ReportService(ISqlSugarClient _sqlSugarClient)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
     }
 
     //public async UnaryResult<double> AddAsync(ReportInput input)
@@ -93,6 +93,7 @@ public class ReportService : IReportService
         // 此处数组是权限按钮信息
         ReportQueryInput input = inputs.Data;
         String[] arr = input.CodeList?.Split(',');
+        var flag = input.ReportCode.IsNotNullOrEmpty();
         RefAsync<int> total = 0;
         //分页查询
         var data = await repository.Queryable<AutoReport>()
@@ -127,7 +128,7 @@ public class ReportService : IReportService
         {
             List<AutoReport> res = new List<AutoReport>();
             string[] codeList = data.Select(x => x.ReportCode).ToArray();
-            var reportExcels = await repository.Queryable<ReportExcel>().Where(x => x.ReportCode.In(codeList)).ToListAsync();
+            var reportExcels = await repository.Queryable<ReportExcel>().Where(x => codeList.Contains(x.ReportCode)).ToListAsync();
             foreach(var item in reportExcels)
             {
                 if (item.SetCodes.IndexOf(input.SetCode) != -1)

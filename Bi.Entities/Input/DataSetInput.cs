@@ -36,14 +36,6 @@ public class DataSetInput : BaseInput
     ///备用3
     ///</summary>
     public string? Opt3 { set; get; }
-    ///<summary>
-    ///备用4
-    ///</summary>
-    public string? Opt4 { set; get; }
-    ///<summary>
-    ///备用5
-    ///</summary>
-    public string? Opt5 { set; get; }
 }
 
 public class TableInput

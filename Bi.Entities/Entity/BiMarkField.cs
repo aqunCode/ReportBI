@@ -83,7 +83,7 @@ public class BiMarkField : BaseEntity
     ///<summary>
     ///DELETEFLAG
     ///</summary>
-    public string? DeleteFlag { set; get; }
+    public int DeleteFlag { set; get; }
 	///<summary>
 	///OPT1
 	///</summary>
@@ -96,10 +96,6 @@ public class BiMarkField : BaseEntity
 	///OPT3
 	///</summary>
 	public string? Opt3 { set; get; }
-	///<summary>
-	///OPT4
-	///</summary>
-	public string? Opt4 { set; get; }
 		
 }
 

@@ -69,7 +69,7 @@ public class BiCalculatorServices : IBiCalculatorServices
     {
         this.rService = service;
         this.filterServices = filterServices;
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dbEngineService = dbService;
         this.aggregationServices = aggregationServices;
         this.markServices = markServices;
@@ -421,7 +421,10 @@ public class BiCalculatorServices : IBiCalculatorServices
 
             return dber.GetValue();
         }
-        return new DataTable();
+        else
+        {
+            return dt;
+        }
     }
 
     private int sortByColumn(int index, DataTableHelper dber, string[] groupByArr, string orderStr, int sortCount, BIWorkbookInput input, string? sourceType)

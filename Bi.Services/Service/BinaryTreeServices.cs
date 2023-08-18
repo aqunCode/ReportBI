@@ -26,7 +26,7 @@ public class BinaryTreeServices : IBinaryTreeServices
     public BinaryTreeServices(ISqlSugarClient _sqlSugarClient
                                 , IDbEngineServices dbService)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dbEngine = dbService;
     }
 

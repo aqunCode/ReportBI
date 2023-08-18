@@ -17,7 +17,7 @@ public interface IFtpService : IDependency {
     /// </summary>
     /// <param name="imageId"></param>
     /// <returns></returns>
-    Task<MemoryStream> showImage(string imageId);
+    Task<string> showImage(string imageId);
     /// <summary>
     /// 用于前台多个BI报表图片缓存
     /// </summary>

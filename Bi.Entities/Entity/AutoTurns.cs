@@ -5,7 +5,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable("auto_turn")]
+[SugarTable("bi_auto_turn")]
 [MessagePackObject(true)]
 public class AutoTurns : BaseEntity
 {

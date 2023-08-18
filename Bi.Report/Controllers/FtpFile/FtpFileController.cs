@@ -4,6 +4,10 @@ using Bi.Entities.Input;
 using Bi.Entities.Entity;
 using Bi.Services.IService;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Baize.Report.Controllers.FtpFile;
 
@@ -47,18 +51,18 @@ public class FtpFileController : BaseController {
     [HttpGet]
     //[ActionName("showImage/{imageId}")]
     [Route("showImage/{imageId}")]
-    public async Task<IActionResult> showImage(string imageId) {
-        MemoryStream ms = await services.showImage(imageId);
-        return File(ms.ToArray(), imageId.GetContentType(), imageId);
-        /* Response.Headers["Content-Type"] = imageId.GetContentType();
-         MemoryStream ms = services.showImage(imageId).Result;
-         return ms.ToArray();*/
-        /*Response.Headers["Content-Type"] = imageId.GetContentType();
-        MemoryStream ms = await services.showImage(imageId);
-        return File(ms.ToArray(), imageId.GetContentType(), imageId);*/
-        /*MemoryStream ms = services.showImage(imageId).Result;
-        //Response.Headers["Content-Type"] = imageId.GetContentType();
-        return ms.ToArray();*/
+    public async Task<IActionResult> showImage(string imageId) 
+    {
+
+        string path = await services.showImage(imageId);
+        var extension = System.IO.Path.GetExtension(imageId);
+        string contentType = extension switch
+        {
+            ".png" => "image/png",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            _ => "application/octet-stream" // 未知类型，默认为二进制流
+        };
+        return PhysicalFile(path, contentType, imageId);
     }
 
     /// <summary>

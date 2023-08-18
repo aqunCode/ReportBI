@@ -43,7 +43,7 @@ public class DataItemDetailController : BaseController
     [ActionName("getlist")]
     public async Task<ResponseResult<IEnumerable<DataItemDetailResponse>>> GetListAsync(DataItemDetailQueryInput input)
     {
-        var data = await _dataItemDetailService.GetListAsync(input, false);
+        var data = await _dataItemDetailService.GetListAsync(input);
         return Success(data);
     }
 

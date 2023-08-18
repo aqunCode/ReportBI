@@ -2,11 +2,13 @@
 using Bi.Core.Extensions;
 using Bi.Core.Models;
 using Bi.Entities.Entity;
+using Bi.Entities.Input;
 using Bi.Entities.Response;
 using Bi.Services.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -78,5 +80,278 @@ internal class MenuButtonService : IMenuButtonService
 
         return await _repository.FindListAsync<AuthMenuResponse>(builder.Sql, builder.Parameters);*/
         
+    }
+
+    public async Task<PageEntity<IEnumerable<MenuButtonResponse>>> GetPageListTreeAsync(PageEntity<MenuButtonQueryInput> input)
+    {
+        List<MenuButtonResponse> data = new();
+        if(input.Data.ParentId == "3664875E390145FFA8422B80E8AE744B")
+        {
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE700A6",
+                Category = 2,
+                Source = 1,
+                Name = "sdf",
+                Title = "新增",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-xinzeng",
+                SortCode = 1,
+                Apis = "add"
+            });
+            return new PageEntity<IEnumerable<MenuButtonResponse>>
+            {
+                PageIndex = input.PageIndex,
+                Ascending = input.Ascending,
+                PageSize = input.PageSize,
+                OrderField = input.OrderField,
+                Total = data.Count,
+                Data = data
+            };
+        }
+
+        if(input.Data.ParentId == "433599FB0E9542969DB2745268C5A290")
+        {
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A02",
+                Category = 2,
+                Source = 1,
+                Name = "attentionTemplate",
+                Title = "考勤模型",
+                ParentId = input.Data.ParentId,
+                Href = "attentionTemplate",
+                Component = "",
+                Icon = "icon iconfont icon-xinzeng",
+                SortCode = 1,
+                Apis = "",
+                Remark = "考勤模型,固定人员可以观看"
+            });
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A03",
+                Category = 2,
+                Source = 1,
+                Name = "machineTemplate",
+                Title = "设备模型",
+                ParentId = input.Data.ParentId,
+                Href = "machineTemplate",
+                Component = "",
+                Icon = "icon iconfont icon-xinzeng",
+                SortCode = 2,
+                Apis = "",
+                Remark = "设备模型,关于设备项目专案"
+            });
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A04",
+                Category = 2,
+                Source = 1,
+                Name = "add",
+                Title = "新增",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-xinzeng",
+                SortCode = 11,
+                Apis = "add",
+                Remark = "0"
+            });
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A05",
+                Category = 2,
+                Source = 1,
+                Name = "edit",
+                Title = "修改",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-edit",
+                SortCode = 1,
+                Apis = "edit",
+                Remark = "0"
+            });
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A06",
+                Category = 2,
+                Source = 12,
+                Name = "delete",
+                Title = "删除",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-delete",
+                SortCode = 13,
+                Apis = "delete",
+                Remark = "0"
+            });
+
+
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A07",
+                Category = 2,
+                Source = 1,
+                Name = "add",
+                Title = "新增",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-xinzeng",
+                SortCode = 14,
+                Apis = "add",
+                Remark = "1"
+            });
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A08",
+                Category = 2,
+                Source = 1,
+                Name = "edit",
+                Title = "修改",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-edit",
+                SortCode = 15,
+                Apis = "edit",
+                Remark = "1"
+            });
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A09",
+                Category = 2,
+                Source = 12,
+                Name = "delete",
+                Title = "删除",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-delete",
+                SortCode = 16,
+                Apis = "delete",
+                Remark = "1"
+            });
+
+
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A10",
+                Category = 2,
+                Source = 1,
+                Name = "add",
+                Title = "新增",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-xinzeng",
+                SortCode = 17,
+                Apis = "add",
+                Remark = "2"
+            });
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A11",
+                Category = 2,
+                Source = 1,
+                Name = "edit",
+                Title = "修改",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-edit",
+                SortCode = 18,
+                Apis = "edit",
+                Remark = "2"
+            });
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE70A12",
+                Category = 2,
+                Source = 12,
+                Name = "delete",
+                Title = "删除",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-delete",
+                SortCode = 19,
+                Apis = "delete",
+                Remark = "2"
+            });
+            return new PageEntity<IEnumerable<MenuButtonResponse>>
+            {
+                PageIndex = input.PageIndex,
+                Ascending = input.Ascending,
+                PageSize = input.PageSize,
+                OrderField = input.OrderField,
+                Total = data.Count,
+                Data = data
+            };
+        }
+
+        if (input.Data.ParentId != "0E78529EC9AF4487A1BC21FA871A6740")
+        {
+            data.Add(new MenuButtonResponse
+            {
+                Id = "B0195E68C53F4C1CB7AEFA411AE700A6",
+                Category = 2,
+                Source = 1,
+                Name = "add",
+                Title = "新增",
+                ParentId = input.Data.ParentId,
+                Href = null,
+                Component = "",
+                Icon = "icon iconfont icon-xinzeng",
+                SortCode = 1,
+                Apis = "add"
+            });
+        }
+            
+
+        data.Add(new MenuButtonResponse
+        {
+            Id = "B0195E68C53F4C1CB7AEFA411AE700A5",
+            Category = 2,
+            Source = 1,
+            Name = "edit",
+            Title = "修改",
+            ParentId = input.Data.ParentId,
+            Href = null,
+            Component = "",
+            Icon = "icon iconfont icon-edit",
+            SortCode = 1,
+            Apis = "edit"
+        });
+        data.Add(new MenuButtonResponse
+        {
+            Id = "B0195E68C53F4C1CB7AEFA411AE700A4",
+            Category = 2,
+            Source = 1,
+            Name = "delete",
+            Title = "删除",
+            ParentId = input.Data.ParentId,
+            Href = null,
+            Component = "",
+            Icon = "icon iconfont icon-delete",
+            SortCode = 1,
+            Apis = "delete"
+        });
+        
+        //动态拼接Join条件
+
+        return new PageEntity<IEnumerable<MenuButtonResponse>>
+        {
+            PageIndex = input.PageIndex,
+            Ascending = input.Ascending,
+            PageSize = input.PageSize,
+            OrderField = input.OrderField,
+            Total = data.Count,
+            Data = data
+        };
     }
 }

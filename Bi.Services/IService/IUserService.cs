@@ -13,4 +13,5 @@ public interface IUserService : IDependency
 {
     Task<int> GetAndSetVipLevel(string id);
     Task<CurrentUser> GetEntityAsync(UserQueryInput userQueryInput);
+    Task<(string fileName, byte[] datas)> GetPictureAsync(string fileName);
 }

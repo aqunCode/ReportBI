@@ -36,7 +36,7 @@ public class BIFilterServices : IBIFilterServices
                                 , IDbEngineServices dbService
                                 , DataSourceServices dataSourceService)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dbEngine = dbService;
         this.dbEngineServices = dbEngineServices;
         this.dataSourceService = dataSourceService;
@@ -137,7 +137,7 @@ public class BIFilterServices : IBIFilterServices
     {
         string sql;
         //获取数据源  datasetId ==> datasource
-        var dataSet = (await repository.Queryable<BiDataset>().Where(x => x.Id == input.Data.DatasetId && x.DeleteFlag == "N" ).ToListAsync()).FirstOrDefault();
+        var dataSet = (await repository.Queryable<BiDataset>().Where(x => x.Id == input.Data.DatasetId && x.DeleteFlag == 0 ).ToListAsync()).FirstOrDefault();
         var dataSource = (await repository.Queryable<DataSource>().Where(x => x.SourceCode == dataSet.SourceCode && x.DeleteFlag == 0 ).ToListAsync()).FirstOrDefault();
         if (dataSource == null)
             return("数据源不存在", null);
@@ -150,7 +150,7 @@ public class BIFilterServices : IBIFilterServices
         // 根据nodeid查询从BI_DATASET_NODE获取真正的tablename
         if(input.Data.ColumnType == "1")
         {
-            var dataSets = (await repository.Queryable<BiDatasetNode>().Where(x => x.NodeLabel == input.Data.LabelName && x.DeleteFlag == "N" ).ToListAsync()).FirstOrDefault();
+            var dataSets = (await repository.Queryable<BiDatasetNode>().Where(x => x.NodeLabel == input.Data.LabelName && x.DeleteFlag == 0 ).ToListAsync()).FirstOrDefault();
             sql = $@"SELECT DISTINCT {input.Data.ColumnName} FILTERVALUE FROM {dataSets.TableName} ";
         }
         else if(input.Data.ColumnType == "2")
@@ -159,7 +159,7 @@ public class BIFilterServices : IBIFilterServices
         }
         else
         {
-            var dataSets = (await repository.Queryable<BiDatasetNode>().Where(x => x.Id == input.Data.NodeId && x.DeleteFlag == "N" ).ToListAsync()).FirstOrDefault();
+            var dataSets = (await repository.Queryable<BiDatasetNode>().Where(x => x.Id == input.Data.NodeId && x.DeleteFlag == 0 ).ToListAsync()).FirstOrDefault();
             sql = $@"SELECT DISTINCT {input.Data.ColumnName} FILTERVALUE FROM {dataSets.TableName} ";
         }
 

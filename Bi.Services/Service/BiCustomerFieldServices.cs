@@ -36,7 +36,7 @@ public class BiCustomerFieldServices : IBiCustomerFieldServices
                                     , IServiceProvider serviceProvider
                                     , IServiceScopeFactory scopeFactory)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.biWorkbookDataServices = biWorkbookDataServices;
         this.serviceProvider = serviceProvider;
         this.scopeFactory = scopeFactory;
@@ -49,7 +49,7 @@ public class BiCustomerFieldServices : IBiCustomerFieldServices
     /// </summary>
     public async Task<double> addAsync(BiCustomerFieldInput input)
     {
-        var inputentitys = await repository.Queryable<BiCustomerField>().Where(x =>  x.DatasetId == input.DatasetId && x.FieldCode == input.FieldCode && x.DeleteFlag == "N").ToListAsync();
+        var inputentitys = await repository.Queryable<BiCustomerField>().Where(x =>  x.DatasetId == input.DatasetId && x.FieldCode == input.FieldCode && x.DeleteFlag == 0).ToListAsync();
         if (inputentitys.Any())
             return BaseErrorCode.PleaseDoNotAddAgain;        
         var entity = input.MapTo<BiCustomerField>();
@@ -71,7 +71,7 @@ public class BiCustomerFieldServices : IBiCustomerFieldServices
     {
         var set = input.MapTo<BiCustomerField>();
         repository.Tracking(set);
-        set.DeleteFlag = "Y";
+        set.DeleteFlag = 1;
         set.Modify(input.Id,input.CurrentUser);
         await repository.Updateable<BiCustomerField>(set).ExecuteCommandAsync();
         return BaseErrorCode.Successful;
@@ -106,7 +106,7 @@ public class BiCustomerFieldServices : IBiCustomerFieldServices
         var data = await repository.Queryable<BiCustomerField>()
              .WhereIF(
                  true,
-                 x => x.DeleteFlag == "N")
+                 x => x.DeleteFlag == 0)
             .ToPageListAsync(inputs.PageIndex, inputs.PageSize, total);
 
         return new PageEntity<IEnumerable<BiCustomerField>>
@@ -129,7 +129,7 @@ public class BiCustomerFieldServices : IBiCustomerFieldServices
                 )
             .WhereIF(
                  true,
-                 x => x.DeleteFlag == "N")
+                 x => x.DeleteFlag == 0)
             .Take(1)
             .ToListAsync();
         var res = data.FirstOrDefault();

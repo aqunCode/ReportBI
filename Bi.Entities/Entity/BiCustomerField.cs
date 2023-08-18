@@ -8,7 +8,7 @@ namespace Bi.Entities.Entity;
 /// 创建日期：2022/12/28 17:01:12
 /// 版本：1.0
 /// </summary>
-[SugarTable("BI_CUSTOMER_FIELD")]
+[SugarTable("bi_customer_field")]
 public class BiCustomerField : BaseEntity
 {
     ///<summary>
@@ -46,16 +46,8 @@ public class BiCustomerField : BaseEntity
     ///</summary>
     public string? Opt3 { set; get; }
     ///<summary>
-    ///备用4
-    ///</summary>
-    public string? Opt4 { set; get; }
-    ///<summary>
-    ///备用5
-    ///</summary>
-    public string? Opt5 { set; get; }
-    ///<summary>
     ///是否删除
     ///</summary>
-    public string DeleteFlag { set; get; } = "N";
+    public int DeleteFlag { set; get; } = 0;
 }
 

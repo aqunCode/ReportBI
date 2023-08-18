@@ -4,7 +4,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable("auto_report_excel")]
+[SugarTable("bi_report_excel")]
 [MessagePackObject(true)]
 public class ReportExcel : BaseEntity
 {

@@ -23,7 +23,7 @@ internal class BIRelationServices : IBIRelationServices
     public BIRelationServices(ISqlSugarClient _sqlSugarClient
                         , IDbEngineServices dbService)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
     }
 
 
@@ -33,7 +33,7 @@ internal class BIRelationServices : IBIRelationServices
     /// </summary>
     public async Task<double> addAsync(BIRelationInput input)
     {
-        var inputentitys = await repository.Queryable<BIRelation>().Where(x => x.SourceId == input.DatasetId && x.TargetId == input.FatherId && x.DeleteFlag == "N").ToListAsync();
+        var inputentitys = await repository.Queryable<BIRelation>().Where(x => x.SourceId == input.DatasetId && x.TargetId == input.FatherId && x.DeleteFlag == 0).ToListAsync();
         if (inputentitys.Any())
             return BaseErrorCode.PleaseDoNotAddAgain;
 
@@ -49,7 +49,7 @@ internal class BIRelationServices : IBIRelationServices
     {
         var set = input.MapTo<BIRelation>();
         repository.Tracking(set);
-        set.DeleteFlag = "Y";
+        set.DeleteFlag = 1;
         var res = await repository.Updateable<BIRelation>(set).ExecuteCommandAsync();
         if (res <= 0)
             return BaseErrorCode.Fail;
@@ -66,7 +66,7 @@ internal class BIRelationServices : IBIRelationServices
         repository.Tracking(relation);
         input.MapTo<BIRelationInput,BIRelation>(relation);
         relation.Modify(input.Id,input.CurrentUser);
-        var res = await repository.Updateable<BIRelation>(relation).Where(x => x.DeleteFlag == "N").ExecuteCommandAsync();
+        var res = await repository.Updateable<BIRelation>(relation).Where(x => x.DeleteFlag == 0).ExecuteCommandAsync();
         if (res <= 0)
             return BaseErrorCode.Fail;
         else
@@ -93,7 +93,7 @@ internal class BIRelationServices : IBIRelationServices
                 x => x.SourceId == input.DatasetId && input.FatherId == x.TargetId)
             .WhereIF(
                 true,
-                x => x.DeleteFlag == "N")
+                x => x.DeleteFlag == 0)
             .ToPageListAsync(inputs.PageIndex, inputs.PageSize, total);
 
         return new PageEntity<IEnumerable<BIRelation>>

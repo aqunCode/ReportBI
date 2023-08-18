@@ -27,7 +27,7 @@ public class AggregationServices : IAggregationServices
                                 , IBiCustomerFieldServices syntaxServices)
     {
         this.dbEngineServices = dbEngineServices;
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.syntaxServices = syntaxServices;
     }
 

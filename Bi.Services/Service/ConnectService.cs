@@ -30,7 +30,7 @@ internal class ConnectService : IConnectService
             RoleIds = "a,b,c,d,e",
             CompanyIds = "hostar",
             DepartmentIds = "it",
-            HeadIcon = "coin",
+            HeadIcon = "coin.png",
             Source = 1
         };
 
@@ -38,8 +38,8 @@ internal class ConnectService : IConnectService
         List<Claim> claims = new();
         claims.Add(new Claim(UserClaimTypes.Account, user.Account));
         claims.Add(new Claim(UserClaimTypes.UserId, user.Id));
-        claims.Add(new Claim(ClaimTypes.Name, user.Name));
-        claims.Add(new Claim(ClaimTypes.Email, user.Email));
+        claims.Add(new Claim("Name", user.Name));
+        claims.Add(new Claim("Email", user.Email));
         claims.Add(new Claim(UserClaimTypes.SystemFlag, user.SystemFlag));
         claims.Add(new Claim(UserClaimTypes.RoleId, user.RoleIds));
         claims.Add(new Claim(UserClaimTypes.CompanyId, user.CompanyIds));

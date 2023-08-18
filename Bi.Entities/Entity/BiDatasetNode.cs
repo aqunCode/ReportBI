@@ -8,7 +8,7 @@ namespace Bi.Entities.Entity;
 /// 创建日期：2023/1/2 15:28:09
 /// 版本：1.0
 /// </summary>
-[SugarTable("BI_DATASET_NODE")]
+[SugarTable("bi_dataset_node")]
 public class BiDatasetNode:BaseEntity
 {
 
@@ -49,17 +49,9 @@ public class BiDatasetNode:BaseEntity
 	///</summary>
 	public string? Opt3  { set; get;} 
 	///<summary>
-	///OPT4
-	///</summary>
-	public string? Opt4  { set; get;} 
-	///<summary>
-	///OPT5
-	///</summary>
-	public string? Opt5  { set; get;}
-	///<summary>
 	///DELETEFLAG
 	///</summary>
-	public string DeleteFlag { set; get; } = "N";
+	public int DeleteFlag { set; get; } = 0;
 
     ///<summary>
     ///condition Where 条件

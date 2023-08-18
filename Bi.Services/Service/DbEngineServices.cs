@@ -36,7 +36,7 @@ internal class DbEngineServices : IDbEngineServices
                 sql = $@"SELECT schema_name FROM information_schema.schemata";
                 break;
             case "SqlServer":
-                sql = $@"show databases;";
+                sql = $@"select name from sys.sysdatabases;";
                 break;
             case "Oracle":
                 sql = $@"SELECT USERNAME FROM DBA_USERS 
@@ -86,8 +86,7 @@ internal class DbEngineServices : IDbEngineServices
                         order by tablename asc";
                 break;
             case "SqlServer":
-                sql = @"select name from sysobjects where xtype='u'
-                        order by name asc";
+                sql = $@"select '{user}.dbo' owner ,name table_name from {user}..sysobjects where xtype='U'";
                 break;
             case "Oracle":
                 user = user.IsNullOrEmpty() ? "LEDRPT" : user;
@@ -98,7 +97,7 @@ internal class DbEngineServices : IDbEngineServices
                 break;
             default: //默认情况下认为是Mysql
                 user = user.IsNullOrEmpty() ? "mysql" : user;
-                sql = $@"select CONCAT(table_schema,'.',table_name) 
+                sql = $@"select table_schema OWNER,table_name 
                         from information_schema.tables
                         where TABLE_SCHEMA = '{user}'";
                 break;
@@ -156,15 +155,11 @@ internal class DbEngineServices : IDbEngineServices
                         and b.attname not in ('gp_segment_id','tableoid','ctid','xmax','xmin','cmax','cmin')";
                 break;
             case "SqlServer":
-                sql = $@"SELECT	  A.name AS tableName
-　　	                    , B.name AS columnName
-　　	                    , isnull (D.value,B.name) AS columnComment
-		                    , C.name AS columnType
-　　                    FROM sys.tables A
-　　                    INNER JOIN sys.columns B ON B.object_id = A.object_id
-	                    left join sys.types C ON B.system_type_id = C.system_type_id
-　　                    LEFT JOIN sys.extended_properties D ON D.major_id = B.object_id AND D.minor_id = B.column_id
-　　                    WHERE A.name = '{tableName}'";
+                sql = $@"select b.name tablename,a.name columnname,a.name columnComment,c.name columnType
+　　                   from {user}..syscolumns a 
+　　                   INNER JOIN {user}..sysobjects b on  a.id=b.id 
+　　                    left join {user}..systypes c on a.xtype = c.xtype
+　　                    where B.name='{tableName}'";
                 break;
             case "Oracle":
                 sql = $@"SELECT 
@@ -219,6 +214,9 @@ internal class DbEngineServices : IDbEngineServices
             case SqlSugar.DbType.MySql:
                 checkSql = " select 1 ";
                 break;
+            case SqlSugar.DbType.SqlServer:
+                checkSql = " select 1 value";
+                break;
             default:
                 checkSql = " select 1 ";
                 break;
@@ -252,8 +250,7 @@ internal class DbEngineServices : IDbEngineServices
     /// </summary>
     public string sqlPageRework(string sql, int limitStart, int limitEnd, string sourceType)
     {
-        StringBuilder sb = new StringBuilder("select * from(");
-        sb.Append(sql);
+        StringBuilder sb = new();
 
         switch (sourceType)
         {
@@ -262,6 +259,8 @@ internal class DbEngineServices : IDbEngineServices
             case "MySql":
             case "Doris":
             case "ClickHouse":
+                sb.Append(" select * from(");
+                sb.Append(sql);
                 sb.Append(") t");
                 sb.Append(" limit ");
                 sb.Append(limitStart);
@@ -269,6 +268,8 @@ internal class DbEngineServices : IDbEngineServices
                 sb.Append(limitEnd - limitStart);
                 break;
             case "PostgreSql":
+                sb.Append(" select * from(");
+                sb.Append(sql);
                 sb.Append(") t");
                 sb.Append(" limit ");
                 sb.Append(limitEnd - limitStart);
@@ -276,6 +277,8 @@ internal class DbEngineServices : IDbEngineServices
                 sb.Append(limitStart);
                 break;
             case "Spark":   //  spark 不支持当前写法，以下为自定义写法，后面会处理
+                sb.Append(" select * from(");
+                sb.Append(sql);
                 sb.Append(") t");
                 sb.Append(" limit ");
                 sb.Append(limitEnd);
@@ -283,8 +286,17 @@ internal class DbEngineServices : IDbEngineServices
                 sb.Append(limitStart);
                 break;
             case "SqlServer":
+                sb.Append(" select top ");
+                sb.Append(limitEnd);
+                sb.Append(" * ");
+                sb.Append(" from(");
+                sb.Append(sql);
+                sb.Append(") t");
+                break;
             case "Oracle":
             default: //默认情况下认为是Oracle
+                sb.Append(" select * from(");
+                sb.Append(sql);
                 sb.Append(") t");
                 sb.Append(" OFFSET ");
                 sb.Append(limitStart);

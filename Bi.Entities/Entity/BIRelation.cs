@@ -3,7 +3,7 @@ using SqlSugar;
 
 namespace Bi.Entities.Entity;
 
-[SugarTable(tableName: "BI_DATASETRELATIONAL")]
+[SugarTable(tableName: "bi_dataset_relational")]
 public class BIRelation : BaseEntity
 {
     ///<summary>
@@ -33,7 +33,7 @@ public class BIRelation : BaseEntity
     ///<summary>
     /// 是否删除
     ///</summary>
-    public string DeleteFlag { set; get; } = "N";
+    public int DeleteFlag { set; get; } = 0;
     ///<summary>
     /// 备用1
     ///</summary>
@@ -46,12 +46,4 @@ public class BIRelation : BaseEntity
     /// 备用3
     ///</summary>
     public string? Opt3 { set; get; }
-    ///<summary>
-    /// 备用4
-    ///</summary>
-    public string? Opt4 { set; get; }
-    ///<summary>
-    /// 备用5
-    ///</summary>
-    public string? Opt5 { set; get; }
 }

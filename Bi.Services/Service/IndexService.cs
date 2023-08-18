@@ -232,7 +232,7 @@ public class IndexService : IIndexService
     {
         List<BIWorkbook> list = new();
         var allAuthority = await GetModelList(currentUser);
-        var db = repository.GetConnectionScope("BaiZeRpt");
+        var db = repository.GetConnectionScope("bidb");
         foreach (var authority in allAuthority)
         {
             list.AddRange(await db.Queryable<BIWorkbook>().Where(x=>x.Opt2 == authority.Name).ToListAsync());
@@ -244,7 +244,7 @@ public class IndexService : IIndexService
     private async Task<List<BIWorkbook>> getWorkbookList(IEnumerable<Authority> allAuthority)
     {
         List<BIWorkbook> list = new();
-        var db = repository.GetConnectionScope("BaiZeRpt");
+        var db = repository.GetConnectionScope("bidb");
         foreach (var authority in allAuthority)
         {
             list.AddRange(await db.Queryable<BIWorkbook>().Where(x => x.Opt2 == authority.Name).ToListAsync());
@@ -259,19 +259,18 @@ public class IndexService : IIndexService
         var account = currentUser?.Account ?? "";
         SqlSugarScopeProvider db;
         var urls = ConfigHelper.Get<string>("Urls");
-        if (urls == "http://localhost:8700" || urls == "http://10.32.44.36:8700")
-            db = repository.GetConnectionScope("BaiZeTest");
-        else
-            db = repository.GetConnectionScope("BaiZeRpt");
+        db = repository.GetConnectionScope("bidb");
+
         // 获取当前用户权限信息
-        var authoritys = await db.Ado.SqlQueryAsync<Authority>(@"SELECT id,CATEGORY ,NAME ,TITLE ,PARENTID ,REMARK 
+        /*var authoritys = await db.Ado.SqlQueryAsync<Authority>(@"SELECT id,CATEGORY ,NAME ,TITLE ,PARENTID ,REMARK 
                                 FROM GITEA.UC_MENUBUTTONS um 
                                 WHERE id IN (
 	                                SELECT ura.MENUBUTTONID FROM gitea.UC_USERS uu
 	                                LEFT JOIN gitea.UC_USER_ROLE_RELATIONS ur ON uu.ID  = ur.USERID 
 	                                LEFT JOIN GITEA.UC_ROLE_AUTHORIZES ura ON ur.ROLEID = ura.ROLEID 
 	                                WHERE uu.ACCOUNT =@account
-                                )", new { account = account });
+                                )", new { account = account });*/
+        var authoritys = new List<Authority>();
         // 模型总数
         var root = authoritys.Where(x => x.Category == 1 && x.Name == "preview-bi");
         IEnumerable<Authority> allAuthority;

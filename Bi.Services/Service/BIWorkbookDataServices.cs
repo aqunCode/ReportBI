@@ -16,15 +16,19 @@ public class BIWorkbookDataServices: IBIWorkbookDataServices
 
     private IDbEngineServices dbEngine;
 
-    private DataSetServices dataSetService;
+    private IDataSetServices dataSetService;
+
+    private IDataItemDetailService dataItemDetailService;
 
     public BIWorkbookDataServices(  ISqlSugarClient _sqlSugarClient,
                                     IDbEngineServices dbService,
-                                    DataSetServices dataSetService)
+                                    IDataSetServices dataSetService,
+                                    IDataItemDetailService dataItemDetailService)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dbEngine = dbService;
         this.dataSetService = dataSetService;
+        this.dataItemDetailService = dataItemDetailService;
     }
 
 
@@ -33,13 +37,15 @@ public class BIWorkbookDataServices: IBIWorkbookDataServices
     /// </summary>
     public async Task<(string, IEnumerable<ColumnInfo>)> getTableColumn(BIWorkbookInput inputs)
     {
+        if (inputs.DatasetId.IsNullOrEmpty())
+            return ("请选择数据集", new List<ColumnInfo>());
         #region 展示所有表字段     
         //1.获取除自定义字段以外的所有表字段
         var columninfos = await getColumninfo(inputs.DatasetId);
         List<ColumnInfo> columns  = (List<ColumnInfo>)columninfos.Item2;
 
         //2.加入BI_CUSTOMER_FIELD 自定义字段
-        var customColumn = (await repository.Queryable<BiCustomerField>().Where(x => x.DatasetId == inputs.DatasetId && x.DeleteFlag == "N").ToListAsync());
+        var customColumn = (await repository.Queryable<BiCustomerField>().Where(x => x.DatasetId == inputs.DatasetId && x.DeleteFlag == 0).ToListAsync());
         
         for (int i = 0; i < customColumn.Count; i++)
         {
@@ -103,7 +109,7 @@ public class BIWorkbookDataServices: IBIWorkbookDataServices
     public async Task<(string,IEnumerable<ColumnInfo>)> getColumninfo(string datasetId)
     {
         //1.根据数据集id查询BI_DATASET_NODE
-        var dataSets = await repository.Queryable<BiDatasetNode>().Where(x => x.DatasetCode == datasetId && x.DeleteFlag == "N" && x.Enabled == 1).ToListAsync();
+        var dataSets = await repository.Queryable<BiDatasetNode>().Where(x => x.DatasetCode == datasetId && x.DeleteFlag == 0 && x.Enabled == 1).ToListAsync();
 
         //2.根据SOURCECODE查询auto_data_source获取SOURCETYPE
         string sourceCode = dataSets[0].SourceCode;
@@ -138,12 +144,18 @@ public class BIWorkbookDataServices: IBIWorkbookDataServices
                 columnfullinfo.ColumnType = item.ColumnType;
                 columnfullinfo.ColumnComment = item.ColumnComment;
                 //根据数据字典GITEA.SYS_DATAITEM_DETAIL 字段类型区分维度、指标、时间
-                string datatypesql = $@"SELECT sdd.DETAILNAME datatype FROM GITEA.SYS_DATAITEM_DETAIL sdd WHERE sdd.ITEMID='CB3DB2280BB1478F86A625D5D3F0CD03' AND sdd.DETAILCODE LIKE '%{item.ColumnType}%'";
-                var datatype = await repository.Ado.GetDataTableAsync(datatypesql);
-                //var datatype = await repository.Queryable<String>(datatypesql).ToListAsync();
-                if (datatype != null)
+
+                var dataItems = await dataItemDetailService.GetListAsync(new DataItemDetailQueryInput
                 {
-                    columnfullinfo.DataType = datatype.Rows[0][0].ToString();
+                    ItemCode = "columnType",
+                    OrderBy = "sortCode"
+                });
+                var dataItem = dataItems.FirstOrDefault(x => x.DetailCode.Contains(item.ColumnType.ToUpper()));
+
+
+                if (dataItem != null)
+                {
+                    columnfullinfo.DataType = dataItem.DetailName;
                 }
                 else
                     columnfullinfo.DataType = "String";

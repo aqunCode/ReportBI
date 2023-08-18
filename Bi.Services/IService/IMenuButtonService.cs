@@ -1,5 +1,6 @@
 ﻿using Bi.Core.Interfaces;
 using Bi.Core.Models;
+using Bi.Entities.Input;
 using Bi.Entities.Response;
 using System;
 using System.Collections.Generic;
@@ -12,4 +13,5 @@ namespace Bi.Services.IService;
 public interface IMenuButtonService : IDependency
 {
     Task<IEnumerable<AuthMenuResponse>> GetListTreeCurrentUserAsync(CurrentUser currentUser);
+    Task<PageEntity<IEnumerable<MenuButtonResponse>>> GetPageListTreeAsync(PageEntity<MenuButtonQueryInput> input);
 }

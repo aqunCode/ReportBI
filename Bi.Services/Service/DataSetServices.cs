@@ -34,7 +34,7 @@ public class DataSetServices : IDataSetServices
                            ILogger<DataSetServices> logger,
                            DataSourceServices dataSourceService)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dbEngine = dbService;
         this.redisCache = redisCache.UseKeyPrefix("[BI]");
         this.logger = logger;
@@ -48,7 +48,7 @@ public class DataSetServices : IDataSetServices
     /// </summary>
     public async Task<double> addAsync(DataSetInput input)
     {
-        var inputentitys = await repository.Queryable<BiDataset>().Where(x => x.DatasetCode == input.DatasetCode && x.DeleteFlag == "N").ToListAsync();
+        var inputentitys = await repository.Queryable<BiDataset>().Where(x => x.DatasetCode == input.DatasetCode && x.DeleteFlag == 0).ToListAsync();
         if (inputentitys.Any())
             return BaseErrorCode.PleaseDoNotAddAgain;
 
@@ -106,15 +106,15 @@ public class DataSetServices : IDataSetServices
     {
         var set = input.MapTo<BiDataset>();
         repository.Tracking(set);
-        set.DeleteFlag = "Y";
+        set.DeleteFlag = 1;
         set.Modify(input.Id,input.CurrentUser);
 
         // 获取节点
         List<BiDatasetNode> nodes = await repository.Queryable<BiDatasetNode>().Where(x => x.DatasetCode == input.Id).ToListAsync();
-        nodes.ForEach(x => { x.DeleteFlag = "Y";x.Modify(x.Id, input.CurrentUser); });
+        nodes.ForEach(x => { x.DeleteFlag = 1;x.Modify(x.Id, input.CurrentUser); });
         // 获取边
         List<BIRelation> relations = await repository.Queryable<BIRelation>().Where(x => x.DatasetCode == input.Id).ToListAsync();
-        relations.ForEach(x => { x.DeleteFlag = "Y";x.Modify(x.Id,input.CurrentUser); } );
+        relations.ForEach(x => { x.DeleteFlag = 1;x.Modify(x.Id,input.CurrentUser); } );
 
         
         try
@@ -122,6 +122,7 @@ public class DataSetServices : IDataSetServices
             repository.Ado.BeginTran();
             // 删除数据集
             await repository.Updateable<BiDataset>(set).ExecuteCommandAsync();
+            repository.TempItems.Clear();
             // 删除数据集节点信息
             await repository.Updateable<BiDatasetNode>(nodes).ExecuteCommandAsync();
             // 删除数据集关联信息
@@ -173,7 +174,7 @@ public class DataSetServices : IDataSetServices
         #region 自定义字段检查删除
         // 修改后的被删除的节点是否有自定义字段？
         // 1.数据集下已创建的字段
-        List<BiCustomerField> customs = await repository.Queryable<BiCustomerField>().Where(x => x.DatasetId == input.Id && x.DeleteFlag=="N").ToListAsync();
+        List<BiCustomerField> customs = await repository.Queryable<BiCustomerField>().Where(x => x.DatasetId == input.Id && x.DeleteFlag==0).ToListAsync();
         // 2.遍历自定义字段中的表名称，查询节点中是否存在该表名称
         for(int i = 0; i< customs.Count; i++)
         {
@@ -187,7 +188,7 @@ public class DataSetServices : IDataSetServices
                 //deletecus.Add((await repository.Queryable<BiCustomerField>().Where(x => x.DatasetId == input.Id && x.LabelName == node.NodeLabel && x.DeleteFlag == "N").ToListAsync()).FirstOrDefault());                              
             }
             if ( deletecus==0)
-                custom.DeleteFlag = "Y";
+                custom.DeleteFlag = 1;
         }
         #endregion
 
@@ -241,7 +242,7 @@ public class DataSetServices : IDataSetServices
                 x => x.DatasetName.Contains(input.DatasetName))
             .WhereIF(
                 true,
-                x => x.DeleteFlag == "N" )
+                x => x.DeleteFlag == 0 )
             .ToPageListAsync(inputs.PageIndex, inputs.PageSize, total);
 
         return new PageEntity<IEnumerable<BiDataset>>
@@ -259,7 +260,7 @@ public class DataSetServices : IDataSetServices
     /// </summary>
     public async Task<IEnumerable<BiDataset>> getSelectlist()
     {
-        var data = await repository.Queryable<BiDataset>().Where(x=> x.DeleteFlag == "N").ToListAsync();
+        var data = await repository.Queryable<BiDataset>().Where(x=> x.DeleteFlag == 0).ToListAsync();
 
         List<BiDataset> list = new List<BiDataset>();
         foreach (var dataset in data)
@@ -336,14 +337,14 @@ public class DataSetServices : IDataSetServices
         switch (input.Type?.ToUpper())
         {
             case "TABLE":
-                sql = dbEngine.showColumns(dataSource.SourceType, input.TableName.Split('.')[1].Trim(), input.TableName.Split('.')[0].Trim());
+                sql = dbEngine.showColumns(dataSource.SourceType, input.TableName.Substring(input.TableName.LastIndexOf('.')+1), input.TableName.Split('.')[0].Trim());
                 break;
             case "SQL":
                 var tables = dbEngine.getTablesName(input.TableName);
                 sql = dbEngine.showColumns(dataSource.SourceType, tables);
                 break;
             default:
-                sql = dbEngine.showColumns(dataSource.SourceType, input.TableName.Split('.')[1].Trim(), input.TableName.Split('.')[0].Trim());
+                sql = dbEngine.showColumns(dataSource.SourceType, input.TableName.Substring(input.TableName.LastIndexOf('.')+1), input.TableName.Split('.')[0].Trim());
                 break;
         }
 

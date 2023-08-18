@@ -20,6 +20,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using SqlSugar;
 using Bi.Core.Extensions;
 using Bi.Core.Const;
+using Bi.Core.Helpers;
 
 public class ReportExcelService : IReportExcelService
 {
@@ -47,7 +48,7 @@ public class ReportExcelService : IReportExcelService
                                 IDynamicCodeService dynamicCodeService,
                                 ILogger<ReportExcelService> logger)
     {
-        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("BaiZeRpt");
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
         this.dataCollectServices = dataCollectServices;
         this.dynamicCodeService = dynamicCodeService;
         this.logger = logger;
@@ -1163,8 +1164,8 @@ public class ReportExcelService : IReportExcelService
             // 6，去重 并做 数据筛选
             DataTable dtResult = dt.Clone();
             // 解锁 DataTable 
-            unLockReadOnly(dtResult);
-            unLockReadOnly(dt);
+            DataTableHelper.unLockReadOnly(dtResult);
+            DataTableHelper.unLockReadOnly(dt);
             if (collectInput.SearchAll && "http" != sourceType)
             {
                 // 筛选处理方式 
@@ -1265,18 +1266,6 @@ public class ReportExcelService : IReportExcelService
             cols.Append(",");
         }
         return cols.ToString().TrimEnd(',').Split(',');
-    }
-
-    /// <summary>
-    /// 解锁DataTable 字段只读状态
-    /// </summary>
-    /// <param name="dtResult"></param>
-    private void unLockReadOnly(DataTable dtResult)
-    {
-        for (int i = 0; i < dtResult.Columns.Count; i++)
-        {
-            dtResult.Columns[dtResult.Columns[i].ColumnName].ReadOnly = false;
-        }
     }
 
     /// <summary>
