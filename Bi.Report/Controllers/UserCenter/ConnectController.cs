@@ -1,6 +1,5 @@
 using Bi.Core.Models;
 using Bi.Entities.Input;
-using Bi.Entities.Entity;
 using Bi.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 using Bi.Services.IServicep;

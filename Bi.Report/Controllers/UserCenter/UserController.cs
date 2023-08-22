@@ -8,6 +8,7 @@ using Bi.Entities.Response;
 using Bi.Core.Extensions;
 using Bi.Core.Helpers;
 using System.Net;
+using Bi.Core.Const;
 
 namespace Bi.Report.Controllers.UserCenter;
 
@@ -102,6 +103,57 @@ public class UserController : BaseController
             return BadRequest();
 
         return File(pictureBytes, contentType, data);
+    }
+
+    /// <summary>
+    /// 添加用户信息
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("insert")]
+    public async Task<ResponseResult<string>> insert(UserInput input)
+    {
+        //获取图片字节码
+        input.CurrentUser = this.CurrentUser;
+        var code = await userServices.insert(input);
+        if (code  ==  BaseErrorCode.Successful)
+            return Success("用户添加成功！初始密码123456！");
+        return Error();
+    }
+
+    /// <summary>
+    /// 删除用户信息
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("delete")]
+    public async Task<ResponseResult<string>> delete(UserInput input)
+    {
+        //获取图片字节码
+        input.CurrentUser = this.CurrentUser;
+        var code = await userServices.delete(input);
+        if (code == BaseErrorCode.Successful)
+            return Success("删除成功！");
+        return Error();
+    }
+
+    /// <summary>
+    /// 添加用户信息
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("modify")]
+    public async Task<ResponseResult<string>> modify(UserInput input)
+    {
+        //获取图片字节码
+        input.CurrentUser = this.CurrentUser;
+        var code = await userServices.modify(input);
+        if (code == BaseErrorCode.Successful)
+            return Success("修改成功！");
+        return Error();
     }
 }
 

@@ -1,16 +1,18 @@
-﻿using MessagePack;
-using SqlSugar;
+﻿using Bi.Core.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Bi.Core.Models;
+namespace Bi.Entities.Input;
 
-/// <summary>
-/// 当前用户信息
-/// </summary>
-[MessagePackObject(true)]
-[SugarTable("sys_user")]
-public class CurrentUser : BaseEntity
+public class UserInput : BaseInput
 {
+    /// <summary>
+    /// 主键ID
+    /// </summary>
+    public string? Id { get; set; }
     /// <summary>
     /// 姓名
     /// </summary>
@@ -20,16 +22,6 @@ public class CurrentUser : BaseEntity
     /// 账号
     /// </summary>
     public string? Account { get; set; }
-
-    /// <summary>
-    /// 密码
-    /// </summary>
-    public string? Password { get; set; }
-
-    /// <summary>
-    /// 头像
-    /// </summary>
-    public string? HeadIcon { get; set; }
 
     /// <summary>
     /// 简拼
@@ -47,22 +39,17 @@ public class CurrentUser : BaseEntity
     public string? Email { get; set; }
 
     /// <summary>
-    /// 排序码
-    /// </summary>
-    public int SortCode { get; set; }
-
-    /// <summary>
     /// 角色ids
     /// </summary>
     public string? RoleIds { get; set; }
 
     /// <summary>
-    /// 公司ids
+    /// 公司名称
     /// </summary>
     public string CompanyIds { get; set; }
 
     /// <summary>
-    /// 部门ids
+    /// 部门名称
     /// </summary>
     public string DepartmentIds { get; set; }
 
@@ -81,8 +68,4 @@ public class CurrentUser : BaseEntity
     /// </summary>
     public int IsAdministrator { get; set; }
 
-    /// <summary>
-    /// 上次修改密码时间
-    /// </summary>
-    public DateTime? LastPasswordChangeTime { get; set; }
 }

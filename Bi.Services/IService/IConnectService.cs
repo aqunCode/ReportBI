@@ -1,5 +1,5 @@
 ﻿using Bi.Core.Interfaces;
-using Bi.Entities.Entity;
+using Bi.Entities.Input;
 using Bi.Entities.Response;
 using System;
 using System.Collections.Generic;

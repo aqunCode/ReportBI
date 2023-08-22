@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bi.Entities.Entity;
+namespace Bi.Entities.Input;
 
 /// <summary>
 /// 描述：用于用户登录

@@ -34,7 +34,7 @@ namespace Bi.Core.Const
         /// </summary>
         /// <param name="account"></param>
         /// <returns></returns>
-        public static bool IsAdministrator(string account) =>
-            Administrators.Any(x => x == account);
+        public static int IsAdministrator(string account) =>
+            Administrators.Any(x => x == account)?1:0;
     }
 }
