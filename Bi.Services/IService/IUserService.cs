@@ -1,5 +1,6 @@
 ﻿using Bi.Core.Interfaces;
 using Bi.Core.Models;
+using Bi.Entities.Entity;
 using Bi.Entities.Input;
 using System;
 using System.Collections.Generic;
@@ -32,4 +33,8 @@ public interface IUserService : IDependency
     /// <param name="input"></param>
     /// <returns></returns>
     Task<double> modify(UserInput input);
+    Task<double> roleInsert(RoleAuthorizeInput input);
+    Task<double> roleDelete(RoleAuthorizeInput input);
+    Task<double> roleModify(RoleAuthorizeInput input);
+    Task<PageEntity<IEnumerable<RoleAuthorizeEntity>>> getRolePageList(PageEntity<RoleAuthorizeInput> input);
 }

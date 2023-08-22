@@ -1,17 +1,18 @@
 ﻿using Bi.Core.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SqlSugar;
 
-namespace Bi.Entities.Entity;
+namespace Bi.Entities.Input;
 
-[SugarTable("sys_role")]
-public class RoleAuthorizeEntity : BaseEntity
+public class RoleAuthorizeInput : BaseInput
 {
+    /// <summary>
+    /// guid 主键
+    /// </summary>
+    public string Id { set; get; }
     /// <summary>
     /// 角色id
     /// </summary>
@@ -20,14 +21,8 @@ public class RoleAuthorizeEntity : BaseEntity
     /// 角色id
     /// </summary>
     public string? RoleName { get; set; }
-
     /// <summary>
     /// 菜单/按钮id
     /// </summary>
     public string? MenuButtonId { get; set; }
-
-    /// <summary>
-    /// 来源1-web 2-app
-    /// </summary>
-    public int? Source { get; set; }
 }

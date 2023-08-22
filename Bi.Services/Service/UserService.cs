@@ -1,8 +1,10 @@
 ﻿using Bi.Core.Const;
 using Bi.Core.Extensions;
 using Bi.Core.Models;
+using Bi.Entities.Entity;
 using Bi.Entities.Input;
 using Bi.Services.IService;
+using Polly.Caching;
 using SharpCompress.Common;
 using SqlSugar;
 using System;
@@ -68,5 +70,51 @@ internal class UserService : IUserService
         user.Modify(input.Id,input.CurrentUser);
         await repository.Updateable<CurrentUser>(user).ExecuteCommandAsync();
         return BaseErrorCode.Successful;
+    }
+
+    public async Task<double> roleInsert(RoleAuthorizeInput input)
+    {
+        RoleAuthorizeEntity role = input.MapTo<RoleAuthorizeEntity>();
+        role.Create(input.CurrentUser);
+        await repository.Insertable<RoleAuthorizeEntity>(role).ExecuteCommandAsync();
+        return BaseErrorCode.Successful;
+    }
+
+    public async Task<double> roleDelete(RoleAuthorizeInput input)
+    {
+        RoleAuthorizeEntity role = new RoleAuthorizeEntity { Id = input.Id };
+        await repository.Deleteable<RoleAuthorizeEntity>(role).ExecuteCommandAsync();
+        return BaseErrorCode.Successful;
+    }
+
+    public async Task<double> roleModify(RoleAuthorizeInput input)
+    {
+        if (string.IsNullOrEmpty(input.Id))
+            return BaseErrorCode.Fail;
+        RoleAuthorizeEntity role = input.MapTo<RoleAuthorizeEntity>();
+        role.Modify(input.Id, input.CurrentUser);
+        await repository.Updateable<RoleAuthorizeEntity>(role).ExecuteCommandAsync();
+        return BaseErrorCode.Successful;
+    }
+
+    public async Task<PageEntity<IEnumerable<RoleAuthorizeEntity>>> getRolePageList(PageEntity<RoleAuthorizeInput> input)
+    {
+        var data = await repository.Queryable<RoleAuthorizeEntity>()
+                    .WhereIF(
+                            input.Data.RoleId.IsNotNullOrEmpty()
+                            ,x=>x.RoleId.Contains(input.Data.RoleId))
+                    .WhereIF(
+                            input.Data.RoleName.IsNotNullOrEmpty()
+                            ,x=>x.RoleName.Contains(input.Data.RoleName))
+                    .ToListAsync();
+        return new PageEntity<IEnumerable<RoleAuthorizeEntity>>
+        {
+            PageIndex = input.PageIndex,
+            Ascending = input.Ascending,
+            PageSize = input.PageSize,
+            OrderField = input.OrderField,
+            Total = data.Count,
+            Data = data
+        };
     }
 }

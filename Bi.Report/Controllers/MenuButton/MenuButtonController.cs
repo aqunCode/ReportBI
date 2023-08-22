@@ -5,6 +5,7 @@ using Bi.Services.IService;
 using Bi.Entities.Response;
 using Bi.Core.Extensions;
 using Bi.Entities.Input;
+using Bi.Entities.Entity;
 
 namespace Bi.Report.Controllers.MenuButton;
 
@@ -56,9 +57,9 @@ public class MenuButtonController : BaseController
     /// <returns></returns>
     [HttpPost]
     [ActionName("getpagelisttree")]
-    public async Task<ResponseResult<PageEntity<IEnumerable<MenuButtonResponse>>>> GetPageListTreeAsync(PageEntity<MenuButtonQueryInput> input)
+    public async Task<ResponseResult<PageEntity<IEnumerable<MenuButtonResponse>>>> GetPageListTreeAsync(PageEntity<MenuButtonInput> input)
     {
-        input.Data ??= new MenuButtonQueryInput();
+        input.Data ??= new MenuButtonInput();
         input.Data.CurrentUser = this.CurrentUser;
         var result = await menuButtonService.GetPageListTreeAsync(input);
         if (result?.Data?.Count() > 0)
@@ -69,5 +70,73 @@ public class MenuButtonController : BaseController
         }
         return Success(result);
     }
+
+    /// <summary>
+    /// 添加菜单信息
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("insert")]
+    public async Task<ResponseResult> insert(MenuButtonInput input)
+    {
+        input.CurrentUser = this.CurrentUser;
+        var result = await menuButtonService.addAsync(input);
+        if (result > 0)
+            return Success();
+        else
+            return Error();
+    }
+
+    /// <summary>
+    /// 删除菜单信息
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("delete")]
+    public async Task<ResponseResult> deleteAsync(MenuButtonInput input)
+    {
+        input.CurrentUser = this.CurrentUser;
+        var result = await menuButtonService.deleteAsync(input);
+        if (result > 0)
+            return Success("删除执行成功，共删除" + result + "个");
+        else
+            return Error("删除失败！");
+    }
+    
+    /// <summary>
+    /// 修改菜单信息
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("modify")]
+    public async Task<ResponseResult> modifyAsync(MenuButtonInput input)
+    {
+        input.CurrentUser = this.CurrentUser;
+        var result = await menuButtonService.ModifyAsync(input);
+        if (result > 0)
+            return Success();
+        else
+            return Error();
+    }
+
+    /// <summary>
+    /// datasource  列表
+    /// </summary>
+    /// <param name="inputs"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("getPagelist")]
+    public async Task<ResponseResult<PageEntity<IEnumerable<MenuButtonEntity>>>> getPagelist(PageEntity<MenuButtonInput> inputs)
+    {
+        var res = await menuButtonService.getEntityListAsync(inputs);
+        return Success(res);
+    }
+
+    
+
+    
 
 }

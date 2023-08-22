@@ -1,5 +1,6 @@
 ﻿using Bi.Core.Models;
 using System;
+using SqlSugar;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Bi.Entities.Entity;
 
+[SugarTable("sys_menu_button")]
 public class MenuButtonEntity : BaseEntity
 {
     /// <summary>

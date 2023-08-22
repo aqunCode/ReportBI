@@ -5,6 +5,7 @@ using Bi.Entities.Entity;
 using Bi.Entities.Input;
 using Bi.Entities.Response;
 using Bi.Services.IService;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,25 +17,56 @@ namespace Bi.Services.Service;
 
 internal class MenuButtonService : IMenuButtonService
 {
+    /// <summary>
+    /// 数据库链接
+    /// </summary>
+    private SqlSugarScopeProvider repository;
+
+    public MenuButtonService(ISqlSugarClient _sqlSugarClient)
+    {
+        repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
+    }
+
+    /// <summary>
+    /// 根据用户信息获取当前用户下的菜单权限
+    /// </summary>
+    /// <returns></returns>
     public async Task<IEnumerable<AuthMenuResponse>> GetListTreeCurrentUserAsync(CurrentUser user)
     {
-        List<AuthMenuResponse> authMenus = new ();
-        authMenus.Add(new AuthMenuResponse
+        var userInfo = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == user.Account);
+        if (userInfo == null)
+            return null; 
+        string[] arr = userInfo.RoleIds.Split(',');
+        var roles = await repository.Queryable<RoleAuthorizeEntity>().Where(x=> arr.Contains(x.RoleId)).ToListAsync();
+
+        List<string> list = new();
+        foreach(var role in roles)
         {
-            Id = "a",
-            Name = "report",
-            Title = "reportT",
-            ParentId = "0",
-            Href = "views\\bill-design-manage\\data-set.vue",
-            Category = 1,
-            Source = 1,
-            Component = "",
-            Icon = "",
-            Apis = "",
-            SortCode = 1
-        });
+            list.AddRange(role.MenuButtonId.Split(','));
+        }
+        IEnumerable<string> enums = list.Distinct();
+
+        var menus = await repository.Queryable<MenuButtonEntity>().Where(x => enums.Contains(x.Id)).ToListAsync();
+        var fatherMenus = menus.Where(x => x.Category == 1);
+
+        List<AuthMenuResponse> authMenus = new();
+        foreach (var menu in fatherMenus)
+        {
+            AuthMenuResponse menuRes = menu.MapTo<AuthMenuResponse>();
+            var chilMenus = menus.Where(x => x.ParentId == menu.Id);
+            
+            if (chilMenus.Any())
+            {
+                menuRes.Children = new List<AuthMenuResponse>();
+                foreach (var chilMenu in chilMenus)
+                {
+                    menuRes.Children.Add(chilMenu.MapTo<AuthMenuResponse>());
+                }
+            }   
+        }
         return authMenus;
 
+        #region 原始写法注释
         /*//动态拼接Join条件
 
         var condition = LinqExtensions
@@ -79,10 +111,10 @@ internal class MenuButtonService : IMenuButtonService
                         .Distinct();
 
         return await _repository.FindListAsync<AuthMenuResponse>(builder.Sql, builder.Parameters);*/
-        
+        #endregion
     }
 
-    public async Task<PageEntity<IEnumerable<MenuButtonResponse>>> GetPageListTreeAsync(PageEntity<MenuButtonQueryInput> input)
+    public async Task<PageEntity<IEnumerable<MenuButtonResponse>>> GetPageListTreeAsync(PageEntity<MenuButtonInput> input)
     {
         List<MenuButtonResponse> data = new();
         if(input.Data.ParentId == "3664875E390145FFA8422B80E8AE744B")
@@ -353,5 +385,24 @@ internal class MenuButtonService : IMenuButtonService
             Total = data.Count,
             Data = data
         };
+    }
+
+    public Task<int> addAsync(MenuButtonInput input)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<int> deleteAsync(MenuButtonInput input)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<int> ModifyAsync(MenuButtonInput input)
+    {
+        throw new NotImplementedException();
+    }
+    public Task<PageEntity<IEnumerable<MenuButtonEntity>>> getEntityListAsync(PageEntity<MenuButtonInput> inputs)
+    {
+        throw new NotImplementedException();
     }
 }

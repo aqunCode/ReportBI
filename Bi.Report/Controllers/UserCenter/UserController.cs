@@ -61,7 +61,7 @@ public class UserController : BaseController
     /// <returns></returns>
     [HttpPost]
     [ActionName("getcurrentuser")]
-    public async Task<ResponseResult<CurrentUserResponse>> GetCurrentUserAsync()
+    public async Task<ResponseResult<CurrentUserResponse>> getCurrentUserAsync()
     {
         var currentUser = this.CurrentUser;
         var user = await userServices.GetEntityAsync(new UserQueryInput { Id = CurrentUser.Id, Enabled = -1 });
@@ -90,7 +90,7 @@ public class UserController : BaseController
     /// <returns></returns>
     [HttpGet]
     [ActionName("getheadicon")]
-    public async Task<IActionResult> GetHeadIconAsync(string fileName)
+    public async Task<IActionResult> getHeadIconAsync(string fileName)
     {
         //获取图片字节码
         var (data, pictureBytes) = await userServices.GetPictureAsync(fileName);
@@ -154,6 +154,69 @@ public class UserController : BaseController
         if (code == BaseErrorCode.Successful)
             return Success("修改成功！");
         return Error();
+    }
+
+    /// <summary>
+    /// 添加角色信息
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("roleInsert")]
+    public async Task<ResponseResult<string>> roleInsert(RoleAuthorizeInput input)
+    {
+        //获取图片字节码
+        input.CurrentUser = this.CurrentUser;
+        var code = await userServices.roleInsert(input);
+        if (code == BaseErrorCode.Successful)
+            return Success("添加角色成功!");
+        return Error();
+    }
+
+    /// <summary>
+    /// 删除角色信息
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("roleDelete")]
+    public async Task<ResponseResult<string>> roleDelete(RoleAuthorizeInput input)
+    {
+        //获取图片字节码
+        input.CurrentUser = this.CurrentUser;
+        var code = await userServices.roleDelete(input);
+        if (code == BaseErrorCode.Successful)
+            return Success("删除成功！");
+        return Error();
+    }
+
+    /// <summary>
+    /// 修改角色信息
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("roleModify")]
+    public async Task<ResponseResult<string>> roleModify(RoleAuthorizeInput input)
+    {
+        //获取图片字节码
+        input.CurrentUser = this.CurrentUser;
+        var code = await userServices.roleModify(input);
+        if (code == BaseErrorCode.Successful)
+            return Success("修改成功！");
+        return Error();
+    }
+
+    /// <summary>
+    /// 查询所有角色信息
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("getRolePageList")]
+    public async Task<ResponseResult<PageEntity<IEnumerable<RoleAuthorizeEntity>>>> getRolePageList(PageEntity<RoleAuthorizeInput> input)
+    {
+        //获取图片字节码
+        var result = await userServices.getRolePageList(input);
+        return Success(result);
     }
 }
 
