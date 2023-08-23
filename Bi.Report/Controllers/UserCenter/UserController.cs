@@ -86,7 +86,7 @@ public class UserController : BaseController
     /// <summary>
     /// 获取用户头像
     /// </summary>
-    /// <param name="fileName"></param>
+    /// <param name="fileName">图片名称</param>
     /// <returns></returns>
     [HttpGet]
     [ActionName("getheadicon")]
@@ -144,7 +144,7 @@ public class UserController : BaseController
     /// </summary>
     /// <param name="fileName"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpPut]
     [ActionName("modify")]
     public async Task<ResponseResult<string>> modify(UserInput input)
     {

@@ -15,6 +15,7 @@ namespace Bi.Entities.Input;
 [MessagePackObject(true)]
 public class MenuButtonInput : BaseInput
 {
+    public string? Id { set; get; }
     /// <summary>
     /// 父级菜单id
     /// </summary>

@@ -17,10 +17,12 @@ using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Bmp;
 using SixLabors.ImageSharp.Formats.Tga;
+using Bi.Core.Const;
 
 namespace Bi.Services.Service;
 
-public class FtpService : IFtpService {
+public class FtpService : IFtpService
+{
 
     /// <summary>
     /// 仓储字段
@@ -28,6 +30,7 @@ public class FtpService : IFtpService {
     private SqlSugarScopeProvider repository;
 
     private ILogger<FtpService> logger;
+
 
     public FtpService(ISqlSugarClient _sqlSugarClient
                        , ILogger<FtpService> logger)
@@ -160,6 +163,48 @@ public class FtpService : IFtpService {
             PageIndex = input.PageIndex,
             Data = result
         };
+    }
+
+    public async Task<string> uploadHeadicon(FtpImageInput input)
+    {
+        var imageFile = input.File;
+        if (imageFile == null)
+        {
+            throw new Exception("请选择要上传的图片！");
+        }
+
+        var imageName = $"coin_{Path.GetRandomFileName()}{Path.GetExtension(imageFile.FileName)}";
+        var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "picture");
+        if (!Directory.Exists(filePath))
+        {
+            Directory.CreateDirectory(filePath);
+        }
+        var imagePath = Path.Combine(filePath, imageName);
+
+        using (var stream = imageFile.OpenReadStream())
+        using (var image = Image.Load(stream))
+        {
+            image.Mutate(x => x.BackgroundColor(Color.Transparent)); // 设置背景色为透明
+
+            //var encoder = new PngEncoder();
+            var encoder = getEncoder(Path.GetExtension(imageFile.FileName));
+            image.Save(imagePath, encoder);
+        }
+        #region 修改账户信息（注释）
+        /*string account = input.CurrentUser.Account;
+        if (account.IsNullOrEmpty())
+            throw new Exception("账号异常！");
+
+
+        var user = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == account);
+        if(user == null)
+            throw new Exception("请选择要上传的图片！");
+
+        user.HeadIcon = imageName;
+        await repository.Updateable< CurrentUser >(user).ExecuteCommandAsync();*/
+        #endregion
+
+        return imageName;
     }
 }
 

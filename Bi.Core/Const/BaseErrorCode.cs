@@ -47,6 +47,11 @@ namespace Bi.Core.Const
         /// <summary>
         /// 无效输入参数
         /// </summary>
+        public const double Invalid_Account = 10000;
+
+        /// <summary>
+        /// 无效输入参数
+        /// </summary>
         public const double Invalid_Input = 10001;
 
         /// <summary>

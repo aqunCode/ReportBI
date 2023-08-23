@@ -51,6 +51,9 @@ internal class UserService : IUserService
     {
         CurrentUser user = input.MapTo<CurrentUser>();
         user.Create(input.CurrentUser);
+        user.LastPasswordChangeTime = DateTime.Now;
+        // 默认头像 小趴菜
+        user.HeadIcon = "coin.png";
         await repository.Insertable<CurrentUser>(user).ExecuteCommandAsync();
         return BaseErrorCode.Successful;
     }
@@ -66,9 +69,12 @@ internal class UserService : IUserService
     {
         if (string.IsNullOrEmpty(input.Id))
             return BaseErrorCode.Fail;
-        CurrentUser user = input.MapTo<CurrentUser>();
+        CurrentUser user = new();
+        repository.Tracking(user);
+        input.MapTo<UserInput,CurrentUser>(user);
         user.Modify(input.Id,input.CurrentUser);
         await repository.Updateable<CurrentUser>(user).ExecuteCommandAsync();
+        repository.TempItems.Clear();
         return BaseErrorCode.Successful;
     }
 

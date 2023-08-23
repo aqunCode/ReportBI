@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Bi.Entities.Input;
 
-public class FtpImageInput {
+public class FtpImageInput : BaseInput {
     /// <summary>
     /// 图片url图片地址
     /// </summary>
@@ -12,6 +12,10 @@ public class FtpImageInput {
     /// 图片form提交
     /// </summary>
     public IFormFile? Data { get; set; }
+    /// <summary>
+    /// 头像form提交
+    /// </summary>
+    public IFormFile? File { get; set; }
     /// <summary>
     /// 图片二进制
     /// </summary>

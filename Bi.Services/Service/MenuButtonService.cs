@@ -387,22 +387,48 @@ internal class MenuButtonService : IMenuButtonService
         };
     }
 
-    public Task<int> addAsync(MenuButtonInput input)
+    public async Task<double> addAsync(MenuButtonInput input)
     {
-        throw new NotImplementedException();
+        MenuButtonEntity menu = input.MapTo<MenuButtonEntity>();
+        menu.Create(input.CurrentUser);
+        await repository.Insertable<MenuButtonEntity>(menu).ExecuteCommandAsync();
+        return BaseErrorCode.Successful;
     }
 
-    public Task<int> deleteAsync(MenuButtonInput input)
+    public async Task<double> deleteAsync(MenuButtonInput input)
     {
-        throw new NotImplementedException();
+        MenuButtonEntity menu = new MenuButtonEntity { Id = input.Id };
+        await repository.Deleteable<MenuButtonEntity>(menu).ExecuteCommandAsync();
+        return BaseErrorCode.Successful;
     }
 
-    public Task<int> ModifyAsync(MenuButtonInput input)
+    public async Task<double> ModifyAsync(MenuButtonInput input)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrEmpty(input.Id))
+            return BaseErrorCode.Fail;
+        MenuButtonEntity menu = input.MapTo<MenuButtonEntity>();
+        menu.Modify(input.Id, input.CurrentUser);
+        await repository.Updateable<MenuButtonEntity>(menu).ExecuteCommandAsync();
+        return BaseErrorCode.Successful;
     }
-    public Task<PageEntity<IEnumerable<MenuButtonEntity>>> getEntityListAsync(PageEntity<MenuButtonInput> inputs)
+    public async Task<PageEntity<IEnumerable<MenuButtonEntity>>> getEntityListAsync(PageEntity<MenuButtonInput> input)
     {
-        throw new NotImplementedException();
+        var data = await repository.Queryable<MenuButtonEntity>()
+                    .WhereIF(
+                            input.Data.ParentId.IsNotNullOrEmpty()
+                            , x => x.ParentId.Contains(input.Data.ParentId))
+                    .WhereIF(
+                            input.Data.Name.IsNotNullOrEmpty()
+                            , x => x.Name.Contains(input.Data.Name))
+                    .ToListAsync();
+        return new PageEntity<IEnumerable<MenuButtonEntity>>
+        {
+            PageIndex = input.PageIndex,
+            Ascending = input.Ascending,
+            PageSize = input.PageSize,
+            OrderField = input.OrderField,
+            Total = data.Count,
+            Data = data
+        };
     }
 }

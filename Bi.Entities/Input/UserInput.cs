@@ -24,6 +24,11 @@ public class UserInput : BaseInput
     public string? Account { get; set; }
 
     /// <summary>
+    /// 头像
+    /// </summary>
+    public string? HeadIcon { get; set; }
+
+    /// <summary>
     /// 简拼
     /// </summary>
     public string? SimpleSpelling { get; set; }

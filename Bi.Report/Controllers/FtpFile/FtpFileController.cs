@@ -8,6 +8,8 @@ using System.IO;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using Bi.Core.Extensions;
+using Bi.Core.Const;
 
 namespace Baize.Report.Controllers.FtpFile;
 
@@ -41,6 +43,22 @@ public class FtpFileController : BaseController {
     [ActionName("upLoadImage")]
     public async Task<ResponseResult<FtpImageInput>> upLoadImage([FromForm] FtpImageInput input) {
         return Success(await services.upLoadImage(input));
+    }
+
+    /// <summary>
+    /// 上传用户头像
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("uploadheadicon")]
+    public async Task<ResponseResult<string>> uploadHeadicon([FromForm] FtpImageInput input)
+    {
+        //获取图片字节码
+        input.CurrentUser = this.CurrentUser;
+        var imageName = await services.uploadHeadicon(input);
+        if (imageName !=  "ERROR")
+            return Success(imageName);
+        return Error();
     }
 
     /// <summary>

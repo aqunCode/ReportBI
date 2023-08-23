@@ -2,6 +2,7 @@
 using Bi.Core.Models;
 using Bi.Entities.Input;
 using Bi.Entities.Entity;
+using Microsoft.AspNetCore.Http;
 
 namespace Bi.Services.IService;
 
@@ -42,5 +43,11 @@ public interface IFtpService : IDependency {
     /// <param name="input"></param>
     /// <returns></returns>
     Task<PageEntity<List<Base64ImageEntity>>> getlist(PageEntity<Base64ImageInput> input);
+    /// <summary>
+    /// 上传用户头像
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task<string> uploadHeadicon(FtpImageInput input);
 }
 

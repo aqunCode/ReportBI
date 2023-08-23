@@ -15,8 +15,8 @@ public interface IMenuButtonService : IDependency
 {
     Task<IEnumerable<AuthMenuResponse>> GetListTreeCurrentUserAsync(CurrentUser currentUser);
     Task<PageEntity<IEnumerable<MenuButtonResponse>>> GetPageListTreeAsync(PageEntity<MenuButtonInput> input);
-    Task<int> addAsync(MenuButtonInput input);
-    Task<int> deleteAsync(MenuButtonInput input);
-    Task<int> ModifyAsync(MenuButtonInput input);
+    Task<double> addAsync(MenuButtonInput input);
+    Task<double> deleteAsync(MenuButtonInput input);
+    Task<double> ModifyAsync(MenuButtonInput input);
     Task<PageEntity<IEnumerable<MenuButtonEntity>>> getEntityListAsync(PageEntity<MenuButtonInput> inputs);
 }
