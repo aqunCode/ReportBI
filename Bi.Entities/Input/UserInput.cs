@@ -14,6 +14,10 @@ public class UserInput : BaseInput
     /// </summary>
     public string? Id { get; set; }
     /// <summary>
+    /// 批量删除
+    /// </summary>
+    public string[] MultiId { get; set; }
+    /// <summary>
     /// 姓名
     /// </summary>
     public string? Name { get; set; }

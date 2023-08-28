@@ -33,6 +33,12 @@ public interface IUserService : IDependency
     /// <param name="input"></param>
     /// <returns></returns>
     Task<double> modify(UserInput input);
+    /// <summary>
+    /// 查询所有用户
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task<PageEntity<IEnumerable<CurrentUser>>> getPageList(PageEntity<UserInput> input);
     Task<double> roleInsert(RoleAuthorizeInput input);
     Task<double> roleDelete(RoleAuthorizeInput input);
     Task<double> roleModify(RoleAuthorizeInput input);

@@ -60,8 +60,13 @@ internal class UserService : IUserService
 
     public async Task<double> delete(UserInput input)
     {
-        CurrentUser user = new CurrentUser{Id = input.Id};
-        await repository.Deleteable<CurrentUser>(user).ExecuteCommandAsync();
+        List<CurrentUser> list = new();
+        if(input.MultiId != null)
+        {
+            foreach(var item in input.MultiId)
+                list.Add( new CurrentUser { Id = item });
+        }
+        await repository.Deleteable<CurrentUser>(list).ExecuteCommandAsync();
         return BaseErrorCode.Successful;
     }
 
@@ -76,6 +81,28 @@ internal class UserService : IUserService
         await repository.Updateable<CurrentUser>(user).ExecuteCommandAsync();
         repository.TempItems.Clear();
         return BaseErrorCode.Successful;
+    }
+
+    public async Task<PageEntity<IEnumerable<CurrentUser>>> getPageList(PageEntity<UserInput> input)
+    {
+        var data = await repository.Queryable<CurrentUser>()
+                    .WhereIF(
+                            input.Data.Account.IsNotNullOrEmpty()
+                            , x => x.Account.Contains(input.Data.Account))
+                    .WhereIF(
+                            input.Data.Name.IsNotNullOrEmpty()
+                            , x => x.Name.Contains(input.Data.Name))
+                    .ToListAsync();
+        data = data.Where(x => x.Account != "admin").ToList();
+        return new PageEntity<IEnumerable<CurrentUser>>
+        {
+            PageIndex = input.PageIndex,
+            Ascending = input.Ascending,
+            PageSize = input.PageSize,
+            OrderField = input.OrderField,
+            Total = data.Count,
+            Data = data
+        };
     }
 
     public async Task<double> roleInsert(RoleAuthorizeInput input)
@@ -123,4 +150,5 @@ internal class UserService : IUserService
             Data = data
         };
     }
+
 }

@@ -144,7 +144,7 @@ public class UserController : BaseController
     /// </summary>
     /// <param name="fileName"></param>
     /// <returns></returns>
-    [HttpPut]
+    [HttpPost]
     [ActionName("modify")]
     public async Task<ResponseResult<string>> modify(UserInput input)
     {
@@ -154,6 +154,19 @@ public class UserController : BaseController
         if (code == BaseErrorCode.Successful)
             return Success("修改成功！");
         return Error();
+    }
+
+    /// <summary>
+    /// 查询所有用户信息
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("getPageList")]
+    public async Task<ResponseResult<PageEntity<IEnumerable<CurrentUser>>>> getPageList(PageEntity<UserInput> input)
+    {
+        //获取图片字节码
+        var result = await userServices.getPageList(input);
+        return Success(result);
     }
 
     /// <summary>
@@ -191,7 +204,6 @@ public class UserController : BaseController
     /// <summary>
     /// 修改角色信息
     /// </summary>
-    /// <param name="fileName"></param>
     /// <returns></returns>
     [HttpPost]
     [ActionName("roleModify")]
@@ -208,7 +220,6 @@ public class UserController : BaseController
     /// <summary>
     /// 查询所有角色信息
     /// </summary>
-    /// <param name="fileName"></param>
     /// <returns></returns>
     [HttpPost]
     [ActionName("getRolePageList")]
