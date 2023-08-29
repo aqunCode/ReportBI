@@ -391,6 +391,7 @@ internal class MenuButtonService : IMenuButtonService
     {
         MenuButtonEntity menu = input.MapTo<MenuButtonEntity>();
         menu.Create(input.CurrentUser);
+        menu.Source = 1;
         await repository.Insertable<MenuButtonEntity>(menu).ExecuteCommandAsync();
         return BaseErrorCode.Successful;
     }
@@ -420,6 +421,9 @@ internal class MenuButtonService : IMenuButtonService
                     .WhereIF(
                             input.Data.Name.IsNotNullOrEmpty()
                             , x => x.Name.Contains(input.Data.Name))
+                    .WhereIF(
+                            true
+                            , x => x.Category == input.Data.Category)
                     .ToListAsync();
         return new PageEntity<IEnumerable<MenuButtonEntity>>
         {

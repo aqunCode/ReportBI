@@ -19,7 +19,7 @@ public class MenuButtonInput : BaseInput
     /// <summary>
     /// 父级菜单id
     /// </summary>
-    public string ParentId { get; set; } = "0";
+    public string? ParentId { get; set; }
 
     /// <summary>
     /// 分类1-菜单 2-按钮
@@ -31,7 +31,7 @@ public class MenuButtonInput : BaseInput
     /// 来源1-web 2-pda 3-oee
     /// </summary>
     [Range(1, 3)]
-    public int Source { get; set; }
+    public int Source { get; set; } = 1;
 
     /// <summary>
     /// 菜单名称
