@@ -177,7 +177,7 @@ public class UserController : BaseController
     [ActionName("roleInsert")]
     public async Task<ResponseResult<string>> roleInsert(RoleAuthorizeInput input)
     {
-        //获取图片字节码
+        //获取图片字节码 
         input.CurrentUser = this.CurrentUser;
         var code = await userServices.roleInsert(input);
         if (code == BaseErrorCode.Successful)
