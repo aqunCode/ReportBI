@@ -135,8 +135,25 @@ public class MenuButtonController : BaseController
         return Success(res);
     }
 
-    
+    /// <summary>
+    /// 获取菜单按钮树状结构
+    /// </summary>
+    /// <param name="inputs"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("getMenuTree")]
+    public async Task<ResponseResult<IEnumerable<MenuButtonTree>>> getMenuTree()
+    {
+        var res = await menuButtonService.getMenuTree();
+        if (res.Count() > 0)
+        {
+            res = res
+                    .TreeToJson("Id", new[] {  "0" }, childName: "children")
+                    .ToObject<IEnumerable<MenuButtonTree>>();
+        }
+        return Success(res);
+    }
 
-    
+
 
 }

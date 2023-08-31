@@ -407,9 +407,12 @@ internal class MenuButtonService : IMenuButtonService
     {
         if (string.IsNullOrEmpty(input.Id))
             return BaseErrorCode.Fail;
-        MenuButtonEntity menu = input.MapTo<MenuButtonEntity>();
+        MenuButtonEntity menu = new();
+        repository.Tracking(menu);
+        input.MapTo<MenuButtonInput,MenuButtonEntity>(menu);
         menu.Modify(input.Id, input.CurrentUser);
         await repository.Updateable<MenuButtonEntity>(menu).ExecuteCommandAsync();
+        repository.TempItems.Clear();
         return BaseErrorCode.Successful;
     }
     public async Task<PageEntity<IEnumerable<MenuButtonEntity>>> getEntityListAsync(PageEntity<MenuButtonInput> input)
@@ -417,13 +420,14 @@ internal class MenuButtonService : IMenuButtonService
         var data = await repository.Queryable<MenuButtonEntity>()
                     .WhereIF(
                             input.Data.ParentId.IsNotNullOrEmpty()
-                            , x => x.ParentId.Contains(input.Data.ParentId))
+                            , x => x.ParentId == input.Data.ParentId)
                     .WhereIF(
                             input.Data.Name.IsNotNullOrEmpty()
                             , x => x.Name.Contains(input.Data.Name))
                     .WhereIF(
-                            true
+                            input.Data.Category != 0
                             , x => x.Category == input.Data.Category)
+                    .OrderBy(x=>x.SortCode)
                     .ToListAsync();
         return new PageEntity<IEnumerable<MenuButtonEntity>>
         {
@@ -434,5 +438,11 @@ internal class MenuButtonService : IMenuButtonService
             Total = data.Count,
             Data = data
         };
+    }
+
+    public async Task<IEnumerable<MenuButtonTree>> getMenuTree()
+    {
+        var res = await repository.Ado.SqlQueryAsync<MenuButtonTree>(" select id,parentid ,title   from bireport.dbo.sys_menu_button");
+        return res;
     }
 }

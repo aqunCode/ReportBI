@@ -19,4 +19,5 @@ public interface IMenuButtonService : IDependency
     Task<double> deleteAsync(MenuButtonInput input);
     Task<double> ModifyAsync(MenuButtonInput input);
     Task<PageEntity<IEnumerable<MenuButtonEntity>>> getEntityListAsync(PageEntity<MenuButtonInput> inputs);
+    Task<IEnumerable<MenuButtonTree>> getMenuTree();
 }

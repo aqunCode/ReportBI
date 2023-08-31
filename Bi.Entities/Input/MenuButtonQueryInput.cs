@@ -24,7 +24,7 @@ public class MenuButtonInput : BaseInput
     /// <summary>
     /// 分类1-菜单 2-按钮
     /// </summary>
-    [Range(1, 2)]
+    [Range(0, 2)]
     public int Category { get; set; }
 
     /// <summary>

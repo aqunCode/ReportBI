@@ -71,6 +71,22 @@ public class MenuButtonResponse : BaseEntity
 }
 
 /// <summary>
+/// 获取所有菜单的树状结构
+/// </summary>
+public class MenuButtonTree
+{
+    public string? Id { get; set; }
+
+    public string? ParentId { get; set; }
+
+    public string? Title { get; set; }
+
+    public bool Expand { get; set; } = true;
+
+    public List<MenuButtonTree> Children { get; set; }
+
+}
+/// <summary>
 /// 当前登录用户的所有菜单
 /// </summary>
 [MessagePackObject(true)]
