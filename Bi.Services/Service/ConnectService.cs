@@ -30,9 +30,11 @@ public class ConnectService : IConnectService
 
     public async Task<TokenResponse> getToken(UserInfo input)
     {
+        // 此处验证OA密码，如密码正确自动注册账号
+
         JwtSettings settings = new ();
-        // 假装查询了数据库
-        var user = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == input.Username);
+
+        var user = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == input.Username && x.Enabled == 1);
         if(user == null)
         {
             return new()
@@ -42,21 +44,6 @@ public class ConnectService : IConnectService
                 Code = 500
             };
         }
-
-        /*CurrentUser user = new CurrentUser
-        {
-            Account = input.Username,
-            Id = "sdfghjkjhgfdsdfghjkkkkkkkksdfs",
-            Name = "葛鹏飞",
-            Email = "1.qq.com",
-            SystemFlag = "Y",
-            RoleIds = "a,b,c,d,e",
-            CompanyIds = "hostar",
-            DepartmentIds = "it",
-            HeadIcon = "coin.png",
-            Source = 1
-        };*/
-
 
         List<Claim> claims = new();
         claims.Add(new Claim(UserClaimTypes.Account, user.Account));

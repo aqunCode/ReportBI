@@ -33,11 +33,11 @@ internal class MenuButtonService : IMenuButtonService
     /// <returns></returns>
     public async Task<IEnumerable<AuthMenuResponse>> GetListTreeCurrentUserAsync(CurrentUser user)
     {
-        var userInfo = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == user.Account);
+        var userInfo = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == user.Account && x.Enabled == 1);
         if (userInfo == null)
-            return null; 
+            return null;
         string[] arr = userInfo.RoleIds.Split(',');
-        var roles = await repository.Queryable<RoleAuthorizeEntity>().Where(x=> arr.Contains(x.RoleId)).ToListAsync();
+        var roles = await repository.Queryable<RoleAuthorizeEntity>().Where(x=> arr.Contains(x.RoleId) && x.Enabled == 1).ToListAsync();
 
         List<string> list = new();
         foreach(var role in roles)
@@ -46,25 +46,21 @@ internal class MenuButtonService : IMenuButtonService
         }
         IEnumerable<string> enums = list.Distinct();
 
-        var menus = await repository.Queryable<MenuButtonEntity>().Where(x => enums.Contains(x.Id)).ToListAsync();
+        List<MenuButtonEntity> menus = new();
+        if (AppSettings.IsAdministrator(userInfo.Account) == 1)
+            menus = await repository.Queryable<MenuButtonEntity>().Where(x => x.Enabled == 1).ToListAsync();
+        else
+            menus = await repository.Queryable<MenuButtonEntity>().Where(x => enums.Contains(x.Id) && x.Enabled == 1).ToListAsync();
+
         var fatherMenus = menus.Where(x => x.Category == 1);
 
         List<AuthMenuResponse> authMenus = new();
         foreach (var menu in fatherMenus)
         {
             AuthMenuResponse menuRes = menu.MapTo<AuthMenuResponse>();
-            var chilMenus = menus.Where(x => x.ParentId == menu.Id);
-            
-            if (chilMenus.Any())
-            {
-                menuRes.Children = new List<AuthMenuResponse>();
-                foreach (var chilMenu in chilMenus)
-                {
-                    menuRes.Children.Add(chilMenu.MapTo<AuthMenuResponse>());
-                }
-            }   
+            authMenus.Add(menuRes);
         }
-        return authMenus;
+        return authMenus.OrderBy(x => x.SortCode).ToList();
 
         #region 原始写法注释
         /*//动态拼接Join条件
@@ -116,266 +112,30 @@ internal class MenuButtonService : IMenuButtonService
 
     public async Task<PageEntity<IEnumerable<MenuButtonResponse>>> GetPageListTreeAsync(PageEntity<MenuButtonInput> input)
     {
+        var userInfo = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == input.Data.CurrentUser.Account && x.Enabled == 1);
+        if (userInfo == null)
+            return null;
+        string[] arr = userInfo.RoleIds.Split(',');
+        var roles = await repository.Queryable<RoleAuthorizeEntity>().Where(x => arr.Contains(x.RoleId) && x.Enabled == 1).ToListAsync();
+
+        List<string> list = new();
+        foreach (var role in roles)
+        {
+            list.AddRange(role.MenuButtonId.Split(','));
+        }
+        IEnumerable<string> enums = list.Distinct();
+
+        List<MenuButtonEntity> menus = new();
+        if (AppSettings.IsAdministrator(userInfo.Account) == 1)
+            menus = await repository.Queryable<MenuButtonEntity>().Where(x =>  x.ParentId == input.Data.ParentId && x.Enabled == 1).ToListAsync();
+        else
+            menus = await repository.Queryable<MenuButtonEntity>().Where(x => enums.Contains(x.Id) && x.ParentId == input.Data.ParentId &&  x.Enabled == 1).ToListAsync();
+
         List<MenuButtonResponse> data = new();
-        if(input.Data.ParentId == "3664875E390145FFA8422B80E8AE744B")
+        foreach(var button in menus)
         {
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE700A6",
-                Category = 2,
-                Source = 1,
-                Name = "sdf",
-                Title = "新增",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-xinzeng",
-                SortCode = 1,
-                Apis = "add"
-            });
-            return new PageEntity<IEnumerable<MenuButtonResponse>>
-            {
-                PageIndex = input.PageIndex,
-                Ascending = input.Ascending,
-                PageSize = input.PageSize,
-                OrderField = input.OrderField,
-                Total = data.Count,
-                Data = data
-            };
+            data.Add(button.MapTo<MenuButtonResponse>());
         }
-
-        if(input.Data.ParentId == "433599FB0E9542969DB2745268C5A290")
-        {
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A02",
-                Category = 2,
-                Source = 1,
-                Name = "attentionTemplate",
-                Title = "考勤模型",
-                ParentId = input.Data.ParentId,
-                Href = "attentionTemplate",
-                Component = "",
-                Icon = "icon iconfont icon-xinzeng",
-                SortCode = 1,
-                Apis = "",
-                Remark = "考勤模型,固定人员可以观看"
-            });
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A03",
-                Category = 2,
-                Source = 1,
-                Name = "machineTemplate",
-                Title = "设备模型",
-                ParentId = input.Data.ParentId,
-                Href = "machineTemplate",
-                Component = "",
-                Icon = "icon iconfont icon-xinzeng",
-                SortCode = 2,
-                Apis = "",
-                Remark = "设备模型,关于设备项目专案"
-            });
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A04",
-                Category = 2,
-                Source = 1,
-                Name = "add",
-                Title = "新增",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-xinzeng",
-                SortCode = 11,
-                Apis = "add",
-                Remark = "0"
-            });
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A05",
-                Category = 2,
-                Source = 1,
-                Name = "edit",
-                Title = "修改",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-edit",
-                SortCode = 1,
-                Apis = "edit",
-                Remark = "0"
-            });
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A06",
-                Category = 2,
-                Source = 12,
-                Name = "delete",
-                Title = "删除",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-delete",
-                SortCode = 13,
-                Apis = "delete",
-                Remark = "0"
-            });
-
-
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A07",
-                Category = 2,
-                Source = 1,
-                Name = "add",
-                Title = "新增",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-xinzeng",
-                SortCode = 14,
-                Apis = "add",
-                Remark = "1"
-            });
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A08",
-                Category = 2,
-                Source = 1,
-                Name = "edit",
-                Title = "修改",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-edit",
-                SortCode = 15,
-                Apis = "edit",
-                Remark = "1"
-            });
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A09",
-                Category = 2,
-                Source = 12,
-                Name = "delete",
-                Title = "删除",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-delete",
-                SortCode = 16,
-                Apis = "delete",
-                Remark = "1"
-            });
-
-
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A10",
-                Category = 2,
-                Source = 1,
-                Name = "add",
-                Title = "新增",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-xinzeng",
-                SortCode = 17,
-                Apis = "add",
-                Remark = "2"
-            });
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A11",
-                Category = 2,
-                Source = 1,
-                Name = "edit",
-                Title = "修改",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-edit",
-                SortCode = 18,
-                Apis = "edit",
-                Remark = "2"
-            });
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE70A12",
-                Category = 2,
-                Source = 12,
-                Name = "delete",
-                Title = "删除",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-delete",
-                SortCode = 19,
-                Apis = "delete",
-                Remark = "2"
-            });
-            return new PageEntity<IEnumerable<MenuButtonResponse>>
-            {
-                PageIndex = input.PageIndex,
-                Ascending = input.Ascending,
-                PageSize = input.PageSize,
-                OrderField = input.OrderField,
-                Total = data.Count,
-                Data = data
-            };
-        }
-
-        if (input.Data.ParentId != "0E78529EC9AF4487A1BC21FA871A6740")
-        {
-            data.Add(new MenuButtonResponse
-            {
-                Id = "B0195E68C53F4C1CB7AEFA411AE700A6",
-                Category = 2,
-                Source = 1,
-                Name = "add",
-                Title = "新增",
-                ParentId = input.Data.ParentId,
-                Href = null,
-                Component = "",
-                Icon = "icon iconfont icon-xinzeng",
-                SortCode = 1,
-                Apis = "add"
-            });
-        }
-            
-
-        data.Add(new MenuButtonResponse
-        {
-            Id = "B0195E68C53F4C1CB7AEFA411AE700A5",
-            Category = 2,
-            Source = 1,
-            Name = "edit",
-            Title = "修改",
-            ParentId = input.Data.ParentId,
-            Href = null,
-            Component = "",
-            Icon = "icon iconfont icon-edit",
-            SortCode = 1,
-            Apis = "edit"
-        });
-        data.Add(new MenuButtonResponse
-        {
-            Id = "B0195E68C53F4C1CB7AEFA411AE700A4",
-            Category = 2,
-            Source = 1,
-            Name = "delete",
-            Title = "删除",
-            ParentId = input.Data.ParentId,
-            Href = null,
-            Component = "",
-            Icon = "icon iconfont icon-delete",
-            SortCode = 1,
-            Apis = "delete"
-        });
-        
-        //动态拼接Join条件
-
         return new PageEntity<IEnumerable<MenuButtonResponse>>
         {
             PageIndex = input.PageIndex,
@@ -383,7 +143,7 @@ internal class MenuButtonService : IMenuButtonService
             PageSize = input.PageSize,
             OrderField = input.OrderField,
             Total = data.Count,
-            Data = data
+            Data = data.OrderBy(x => x.SortCode).ToList()
         };
     }
 
@@ -398,8 +158,12 @@ internal class MenuButtonService : IMenuButtonService
 
     public async Task<double> deleteAsync(MenuButtonInput input)
     {
-        MenuButtonEntity menu = new MenuButtonEntity { Id = input.Id };
-        await repository.Deleteable<MenuButtonEntity>(menu).ExecuteCommandAsync();
+        List<MenuButtonEntity> list = new();
+        foreach(var item in input.multiId)
+        {
+            list.Add(new MenuButtonEntity { Id = item });
+        }
+        await repository.Deleteable<MenuButtonEntity>(list).ExecuteCommandAsync();
         return BaseErrorCode.Successful;
     }
 

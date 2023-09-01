@@ -1,4 +1,5 @@
 ﻿using Bi.Core.Caches;
+using Bi.Core.Const;
 using Bi.Core.Extensions;
 using Bi.Core.Helpers;
 using Bi.Core.Models;
@@ -241,7 +242,7 @@ public class IndexService : IIndexService
         return list;
     }
 
-    private async Task<List<BIWorkbook>> getWorkbookList(IEnumerable<Authority> allAuthority)
+    private async Task<List<BIWorkbook>> getWorkbookList(IEnumerable<MenuButtonEntity> allAuthority)
     {
         List<BIWorkbook> list = new();
         var db = repository.GetConnectionScope("bidb");
@@ -253,33 +254,49 @@ public class IndexService : IIndexService
         return list;
     }
 
-    private async Task<IEnumerable<Authority>> GetModelList(CurrentUser currentUser)
+    private async Task<IEnumerable<MenuButtonEntity>> GetModelList(CurrentUser currentUser)
     {
         List<Authority> list = new();
         var account = currentUser?.Account ?? "";
         SqlSugarScopeProvider db;
-        var urls = ConfigHelper.Get<string>("Urls");
+        //var urls = ConfigHelper.Get<string>("Urls");
         db = repository.GetConnectionScope("bidb");
 
         // 获取当前用户权限信息
-        /*var authoritys = await db.Ado.SqlQueryAsync<Authority>(@"SELECT id,CATEGORY ,NAME ,TITLE ,PARENTID ,REMARK 
-                                FROM GITEA.UC_MENUBUTTONS um 
-                                WHERE id IN (
-	                                SELECT ura.MENUBUTTONID FROM gitea.UC_USERS uu
-	                                LEFT JOIN gitea.UC_USER_ROLE_RELATIONS ur ON uu.ID  = ur.USERID 
-	                                LEFT JOIN GITEA.UC_ROLE_AUTHORIZES ura ON ur.ROLEID = ura.ROLEID 
-	                                WHERE uu.ACCOUNT =@account
-                                )", new { account = account });*/
-        var authoritys = new List<Authority>();
+        var userInfo = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == account && x.Enabled == 1);
+        if (userInfo == null)
+            return null;
+        string[] arr = userInfo.RoleIds.Split(',');
+        var roles = await repository.Queryable<RoleAuthorizeEntity>().Where(x => arr.Contains(x.RoleId) && x.Enabled == 1).ToListAsync();
+
+        List<string> ids = new();
+        foreach (var role in roles)
+        {
+            ids.AddRange(role.MenuButtonId.Split(','));
+        }
+        IEnumerable<string> enums = ids.Distinct();
+
+        List<MenuButtonEntity> menus = new();
+        if (AppSettings.IsAdministrator(userInfo.Account) == 1)
+            menus = await repository.Queryable<MenuButtonEntity>().Where(x => x.Enabled == 1).ToListAsync();
+        else
+            menus = await repository.Queryable<MenuButtonEntity>().Where(x => enums.Contains(x.Id) && x.Enabled == 1).ToListAsync();
+
         // 模型总数
-        var root = authoritys.Where(x => x.Category == 1 && x.Name == "preview-bi");
-        IEnumerable<Authority> allAuthority;
+        var root = menus.Where(x => x.Category == 1 && x.Name == "preview-bi");
         if (root.Any())
         {
             var rootId = root.First().Id;
-            return authoritys.Where(x => x.ParentId == rootId && x.Name.Contains("Template"));
+            var templates = menus.Where(x => x.ParentId == rootId && x.Name.Contains("Template")).ToList();
+            //添加公共模型
+            templates.Add(new MenuButtonEntity
+            {
+                Name = "commonTemplate",
+                Title= "公共模型"
+            });
+            return templates;
         }
         db.Close();
-        return list;
+        return new List<MenuButtonEntity>();
     }
 }

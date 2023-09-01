@@ -38,4 +38,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="picture\coin.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

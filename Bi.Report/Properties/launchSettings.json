@@ -1,10 +1,19 @@
 {
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:50950",
+      "sslPort": 0
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "Bi.Report": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "applicationUrl": "http://192.168.43.215:8700",
+      "applicationUrl": "http://localhost:8701",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

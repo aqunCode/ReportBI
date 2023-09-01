@@ -9,6 +9,7 @@ using Bi.Core.Extensions;
 using Bi.Core.Helpers;
 using System.Net;
 using Bi.Core.Const;
+using Newtonsoft.Json.Linq;
 
 namespace Bi.Report.Controllers.UserCenter;
 
@@ -228,6 +229,19 @@ public class UserController : BaseController
         //获取图片字节码
         var result = await userServices.getRolePageList(input);
         return Success(result);
+    }
+    /// <summary>
+    /// 查询所有角色id列表
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [ActionName("getRoleList")]
+    public async Task<ResponseResult<IEnumerable<JObject>>> getRoleList()
+    {
+        //获取图片字节码
+        var result = await userServices.getRoleList();
+        var res = result.Select(x => new JObject(new JProperty("roleId", x.RoleId), new JProperty("roleName", x.RoleName)));
+        return Success(res);
     }
 }
 

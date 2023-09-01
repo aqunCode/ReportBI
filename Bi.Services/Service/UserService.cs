@@ -151,4 +151,8 @@ internal class UserService : IUserService
         };
     }
 
+    public async Task<IEnumerable<RoleAuthorizeEntity>> getRoleList()
+    {
+        return await repository.Queryable<RoleAuthorizeEntity>().ToListAsync();
+    }
 }

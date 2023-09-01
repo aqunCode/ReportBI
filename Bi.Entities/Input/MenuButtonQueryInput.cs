@@ -17,6 +17,10 @@ public class MenuButtonInput : BaseInput
 {
     public string? Id { set; get; }
     /// <summary>
+    /// 批量删除
+    /// </summary>
+    public string[] multiId { set; get; }
+    /// <summary>
     /// 父级菜单id
     /// </summary>
     public string? ParentId { get; set; }

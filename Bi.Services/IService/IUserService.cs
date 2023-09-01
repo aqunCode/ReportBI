@@ -43,4 +43,5 @@ public interface IUserService : IDependency
     Task<double> roleDelete(RoleAuthorizeInput input);
     Task<double> roleModify(RoleAuthorizeInput input);
     Task<PageEntity<IEnumerable<RoleAuthorizeEntity>>> getRolePageList(PageEntity<RoleAuthorizeInput> input);
+    Task<IEnumerable<RoleAuthorizeEntity>> getRoleList();
 }
