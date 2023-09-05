@@ -18,13 +18,16 @@ public class ReportService : IReportService
     /// </summary>
     private SqlSugarScopeProvider repository;
 
+    private IMenuButtonService menuButtonService;
+
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    public ReportService(ISqlSugarClient _sqlSugarClient)
+    public ReportService(ISqlSugarClient _sqlSugarClient, IMenuButtonService menuButtonService)
     {
         repository = (_sqlSugarClient as SqlSugarScope).GetConnectionScope("bidb");
+        this.menuButtonService = menuButtonService;
     }
 
     //public async UnaryResult<double> AddAsync(ReportInput input)
@@ -61,7 +64,27 @@ public class ReportService : IReportService
         });
 
         if ((await repository.Insertable(entities).ExecuteCommandAsync()) > 0)
+        {
+            try
+            {
+                var father = await repository.Queryable<MenuButtonEntity>().FirstAsync(x => x.Name == "preview-excel");
+                foreach (var item in entities)
+                {
+                    await menuButtonService.addAsync(new MenuButtonInput
+                    {
+                        ParentId = father.Id,
+                        Category = 2,
+                        Name = item.ReportCode,
+                        Title = item.ReportName,
+                        Remark = item.ReportType,
+                        CurrentUser = currentUser,
+                    });
+                }
+            }
+            catch(Exception){ }
             return (true, "ok");
+        }
+            
         return (false, $"fail");
     }
 

@@ -64,8 +64,8 @@ public class FtpService : IFtpService
             var encoder = getEncoder(Path.GetExtension(imageFile.FileName));
             image.Save(imagePath, encoder);
         }
-        string ip = "localhost";
-        // string ip = getLocalIp();
+        //string ip = "localhost";
+        string ip = getLocalIp();
         return new FtpImageInput
         {
             Url = "http://" + ip + ":8700/ftpfile/showimage/showimage/" + imageName

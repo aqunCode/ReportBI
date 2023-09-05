@@ -145,7 +145,7 @@ public class UserController : BaseController
     /// </summary>
     /// <param name="fileName"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpPut]
     [ActionName("modify")]
     public async Task<ResponseResult<string>> modify(UserInput input)
     {
