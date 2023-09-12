@@ -263,11 +263,11 @@ public class IndexService : IIndexService
         db = repository.GetConnectionScope("bidb");
 
         // 获取当前用户权限信息
-        var userInfo = await repository.Queryable<CurrentUser>().FirstAsync(x => x.Account == account && x.Enabled == 1);
+        var userInfo = await db.Queryable<CurrentUser>().FirstAsync(x => x.Account == account && x.Enabled == 1);
         if (userInfo == null)
             return null;
         string[] arr = userInfo.RoleIds.Split(',');
-        var roles = await repository.Queryable<RoleAuthorizeEntity>().Where(x => arr.Contains(x.RoleId) && x.Enabled == 1).ToListAsync();
+        var roles = await db.Queryable<RoleAuthorizeEntity>().Where(x => arr.Contains(x.RoleId) && x.Enabled == 1).ToListAsync();
 
         List<string> ids = new();
         foreach (var role in roles)
@@ -278,9 +278,9 @@ public class IndexService : IIndexService
 
         List<MenuButtonEntity> menus = new();
         if (AppSettings.IsAdministrator(userInfo.Account) == 1)
-            menus = await repository.Queryable<MenuButtonEntity>().Where(x => x.Enabled == 1).ToListAsync();
+            menus = await db.Queryable<MenuButtonEntity>().Where(x => x.Enabled == 1).ToListAsync();
         else
-            menus = await repository.Queryable<MenuButtonEntity>().Where(x => enums.Contains(x.Id) && x.Enabled == 1).ToListAsync();
+            menus = await db.Queryable<MenuButtonEntity>().Where(x => enums.Contains(x.Id) && x.Enabled == 1).ToListAsync();
 
         // 模型总数
         var root = menus.Where(x => x.Category == 1 && x.Name == "preview-bi");

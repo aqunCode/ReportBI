@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -494,7 +495,7 @@ namespace Bi.Core.Extensions
         }
         #endregion
 
-        #region 文本加密
+        #region 文本加密(特殊字符替换)
         /// <summary>
         /// 文本字符串加密
         /// </summary>
@@ -951,6 +952,38 @@ namespace Bi.Core.Extensions
             {
                 var bytes = Convert.FromBase64String(@this);
                 result = (encoding ?? Encoding.UTF8).GetString(bytes);
+            }
+            catch
+            {
+                result = @this;
+            }
+            return result;
+        }
+        #endregion
+
+        #region md5加密
+        /// <summary>
+        /// 字符串Base64解密
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="encoding">编码方式，默认：utf-8</param>
+        /// <returns>解密后的字符串</returns>
+        public static string ToMd5(this string @this, Encoding encoding = null)
+        {
+            var result = string.Empty;
+            try
+            {
+                using (MD5 md5 = MD5.Create())
+                {
+                    byte[] inputBytes = Encoding.UTF8.GetBytes(@this);
+                    byte[] hashBytes = md5.ComputeHash(inputBytes);
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < hashBytes.Length; i++)
+                    {
+                        sb.Append(hashBytes[i].ToString("x2"));
+                    }
+                    result = sb.ToString().ToUpper();
+                }
             }
             catch
             {

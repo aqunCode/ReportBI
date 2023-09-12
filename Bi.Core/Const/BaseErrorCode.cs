@@ -38,26 +38,38 @@ namespace Bi.Core.Const
         /// 失败
         /// </summary>
         public const double Fail = -1;
+        //-------------------------------------------账号报错
+
+        /// <summary>
+        /// 无效输入账号
+        /// </summary>
+        public const double Invalid_Account = 10000;
+        /// <summary>
+        /// 无效密码
+        /// </summary>
+        public const double Invalid_Password = 10001;
+        /// <summary>
+        /// 账号密码有误
+        /// </summary>
+        public const double Wrong_AccountPassword = 10002;
+        /// <summary>
+        /// 无效输入参数
+        /// </summary>
+        public const double Invalid_Input = 10003;
+        /// <summary>
+        /// OA用户信息同步失败
+        /// </summary>
+        public const double Wrong_Sync = 10004;
+        //-------------------------------------------增删改查
+
 
         /// <summary>
         /// 错误详情【动态的错误信息,使用此错误码,错误提示消息放在message中】
         /// </summary>
         public const double ErrorDetail = 500;
 
-        /// <summary>
-        /// 无效输入参数
-        /// </summary>
-        public const double Invalid_Account = 10000;
+        
 
-        /// <summary>
-        /// 无效输入参数
-        /// </summary>
-        public const double Invalid_Input = 10001;
-
-        /// <summary>
-        /// 无效密码
-        /// </summary>
-        public const double Invalid_Password = 10002;
 
         /// <summary>
         /// 无效的图片类型

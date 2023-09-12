@@ -46,10 +46,6 @@ public class CurrentUser : BaseEntity
     /// </summary>
     public string? Email { get; set; }
 
-    /// <summary>
-    /// 排序码
-    /// </summary>
-    public int SortCode { get; set; }
 
     /// <summary>
     /// 角色ids

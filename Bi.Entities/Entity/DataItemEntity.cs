@@ -34,5 +34,5 @@ public class DataItemEntity : BaseEntity
     /// <summary>
     /// 排序码
     /// </summary>
-    public int? SortCode { get; set; }
+    public int SortCode { get; set; }
 }

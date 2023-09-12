@@ -15,6 +15,8 @@ namespace Bi.Entities.Input;
 [MessagePackObject(true)]
 public class DataItemDetailQueryInput : BaseInput
 {
+
+    public string[] multiId { get; set; }
     /// <summary>
     /// 主键Id
     /// </summary>
@@ -45,4 +47,18 @@ public class DataItemDetailQueryInput : BaseInput
     /// </summary>
     public string OrderBy { get; set; }
 
+}
+
+public class DataItemInput : BaseInput
+{
+    /// <summary>
+    /// 主键Id
+    /// </summary>
+    public string Id { get; set; }
+    public string[] multiId { get; set; }
+    public string ItemCode { get; set; }
+
+    public string ItemName { get; set; }
+
+    public string ParentId { get; set; }
 }
