@@ -181,6 +181,7 @@ public class DataCollectServices : IDataCollectServices {
             .WhereIF(
                 true,
                 x => x.DeleteFlag == 0)
+            .OrderBy(inputs.OrderField)
             .ToPageListAsync(inputs.PageIndex, inputs.PageSize, total);
             
         foreach(DataCollect item in data) {
