@@ -6,6 +6,7 @@ using Bi.Entities.Entity;
 using Bi.Entities.Input;
 using Bi.Entities.Response;
 using Bi.Services.IService;
+using Polly.Caching;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
@@ -162,14 +163,18 @@ internal class DataItemDetailService : IDataItemDetailService
 
     public async Task<PageEntity<IEnumerable<DataItemDetailResponse>>> getPagelist(PageEntity<DataItemDetailQueryInput> inputs)
     {
-        var list = await repository.Queryable<DataItemDetailEntity>().Where(x => x.ItemId == inputs.Data.ItemId).ToListAsync();
+        RefAsync<int> total = 0;
+        var list = await repository.Queryable<DataItemDetailEntity>()
+            .Where(x => x.ItemId == inputs.Data.ItemId)
+            .OrderBy(inputs.OrderField)
+            .ToPageListAsync(inputs.PageIndex, inputs.PageSize, total);
         return new PageEntity<IEnumerable<DataItemDetailResponse>>
         {
             PageIndex = inputs.PageIndex,
             Ascending = inputs.Ascending,
             PageSize = inputs.PageSize,
             OrderField = inputs.OrderField,
-            Total = list.Count,
+            Total = total,
             Data = list.MapTo<DataItemDetailResponse>()
         };
     }
