@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using Bi.Core.Const;
+using System.Linq;
 
 public class DataCollectServices : IDataCollectServices {
 
@@ -54,12 +55,17 @@ public class DataCollectServices : IDataCollectServices {
         if(inputentitys.Any())
             throw new Exception("数据集编码重复！");
 
-        foreach(DataCollectItem item in input.DataSetParamDtoList) {
+        int count = input.DataSetParamDtoList?.Count??0;
+        for (int i = 0;i< count; i++)
+        {
+            var item = input.DataSetParamDtoList[i];
             item.SetCode = input.SetCode;
+            item.SortCode = i;
             var entityItem = item.MapTo<DataCollectItem>();
             entityItem.Create(input.CurrentUser);
             repository.Insertable(entityItem).ExecuteCommand();
         }
+
         var entity = input.MapTo<DataCollect>();
         entity.Create(input.CurrentUser);
         repository.Insertable(entity).ExecuteCommand();
@@ -95,7 +101,12 @@ public class DataCollectServices : IDataCollectServices {
         repository.Updateable(modifyRecord).ExecuteCommand();
         //删除Item 表并重新添加
         repository.Deleteable<DataCollectItem>(x => x.SetCode == input.SetCode).ExecuteCommand();
-        foreach (var item in input.DataSetParamDtoList) {
+
+        int count = input.DataSetParamDtoList?.Count ?? 0;
+        for(int i = 0; i < count; i++)
+        {
+            var item = input.DataSetParamDtoList[i];
+            item.SortCode = i;
             item.SetCode = input.SetCode;
             item.Create(input.CurrentUser);
         }
@@ -153,7 +164,10 @@ public class DataCollectServices : IDataCollectServices {
                                          .Keys.ToList();
         */
         #endregion
-        result.DataSetParamDtoList = await repository.Queryable<DataCollectItem>().Where(x => x.SetCode == input.SetCode && x.DeleteFlag == 0).ToListAsync();
+        result.DataSetParamDtoList = await repository.Queryable<DataCollectItem>()
+            .Where(x => x.SetCode == input.SetCode && x.DeleteFlag == 0)
+            .OrderBy(x => x.SortCode)
+            .ToListAsync();
 
         return result;
     }
