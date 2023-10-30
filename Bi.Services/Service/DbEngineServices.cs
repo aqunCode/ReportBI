@@ -286,12 +286,16 @@ internal class DbEngineServices : IDbEngineServices
                 sb.Append(limitStart);
                 break;
             case "SqlServer":
-                sb.Append(" select top ");
-                sb.Append(limitEnd);
-                sb.Append(" * ");
+                sb.Append(" select * from ( ");
+                sb.Append(" select rownumber=ROW_NUMBER() OVER(ORDER BY (SELECT 1)),t.* ");
                 sb.Append(" from(");
                 sb.Append(sql);
-                sb.Append(") t");
+                sb.Append(") t ");
+                sb.Append("  ) t2 where rownumber >=");
+                sb.Append(limitStart);
+                sb.Append(" and rownumber< ");
+                sb.Append(limitEnd);
+
                 break;
             case "Oracle":
             default: //默认情况下认为是Oracle

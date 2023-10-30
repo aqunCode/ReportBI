@@ -551,7 +551,8 @@ public class DataCollectServices : IDataCollectServices {
 
                 while (true) {
                     firstIndex--;
-                    if(firstIndex <= 0) {
+                    var indexKey = dynSentence[firstIndex];
+                    if (firstIndex <= 0) {
                         break;
                     }
                     if('(' == dynSentence[firstIndex]) {
