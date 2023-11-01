@@ -14,12 +14,11 @@ using Bi.Core.Mapster;
 using WatchDog;
 using WatchDog.src.Enums;
 using Bi.Core.Middleware;
-using NLog.Extensions.Logging;
 using NLog.Web;
 using NLog;
 
-var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
-logger.Debug("init main");
+//var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+//logger.Debug("init main");
 
 var builder = WebApplication.CreateBuilder(args);
 // 配置文档
@@ -33,7 +32,8 @@ ConfigHelper.SetConfiguration(configuration);
 
 // NLog: Setup NLog for Dependency injection
 builder.Logging.ClearProviders();
-builder.Host.UseNLog();
+builder.Logging.AddNLog("nlogs/NLog.config");
+// builder.Host.UseNLog();
 
 builder.Services
 
@@ -101,7 +101,7 @@ builder.Services
         x.SuppressModelStateInvalidFilter = true);
 
 builder.Services
-    //扫描程序集注入
+    //扫描程序集注入S
     .AddFromAssembly(
         type => type
             .AssignableTo<IDependency>()
@@ -138,12 +138,12 @@ App.RootServices = app.Services;
 
 var lifeTime = app.Services.GetService<IHostApplicationLifetime>();
 
-var iLogger = app.Services.GetService<Microsoft.Extensions.Logging.ILogger>();
+// var iLogger = app.Services.GetService<Microsoft.Extensions.Logging.ILogger>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(configuration);
+    app.UseSwagger(configuration); 
     app.UseDeveloperExceptionPage();
     //app.UseExceptionHandler("/Home/Error");
     //app.UseHsts();
@@ -154,7 +154,8 @@ app
     .UsePolicyCors()
 
     //全局异常处理
-    .UseExceptionHandler(configuration, iLogger)
+    //.UseExceptionHandler(configuration, iLogger)
+    .UseExceptionMiddleware()
 
     //使用路由
     .UseRouting()
@@ -180,5 +181,5 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-NLog.LogManager.Shutdown();
+//NLog.LogManager.Shutdown();
 app.Run();

@@ -19,6 +19,7 @@ namespace Bi.Core.Middleware
 	/// </summary>
 	public static class ExceptionHandlerExtensions
     {
+
         /// <summary>
         /// 全局异常处理
         /// </summary>

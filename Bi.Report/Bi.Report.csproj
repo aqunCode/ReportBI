@@ -19,7 +19,6 @@
     <Folder Include="Controllers\MenuButton\" />
     <Folder Include="JavaHome\linux\lib\applet\" />
     <Folder Include="JavaHome\windows\lib\applet\" />
-    <Folder Include="nlogs\" />
   </ItemGroup>
 
   <ItemGroup>
