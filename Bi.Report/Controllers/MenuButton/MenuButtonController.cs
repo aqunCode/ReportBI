@@ -1,5 +1,4 @@
 using Bi.Core.Models;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Bi.Services.IService;
 using Bi.Entities.Response;

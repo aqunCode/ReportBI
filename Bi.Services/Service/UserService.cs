@@ -83,6 +83,7 @@ internal class UserService : IUserService
         return BaseErrorCode.Successful;
     }
 
+
     public async Task<PageEntity<IEnumerable<CurrentUser>>> getPageList(PageEntity<UserInput> input)
     {
         var data = await repository.Queryable<CurrentUser>()

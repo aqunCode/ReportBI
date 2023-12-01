@@ -20,7 +20,7 @@ namespace Bi.Core.Helpers
         /// </summary>
         static LogHelper()
         {
-            var nlog = @"NLog.config".GetFullPath();
+            var nlog = @"nlogs/NLog.config".GetFullPath();
 
             if (!File.Exists(nlog))
             {

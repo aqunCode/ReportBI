@@ -502,6 +502,8 @@ public class DataCollectServices : IDataCollectServices {
         dynSentence = dynSentence.Replace("\r", " \r ").Replace("\n", " \n ");
         //添加空格避免解析出错
         dynSentence = dynSentence.Replace("(", " ( ").Replace(")", " ) ");
+        dynSentence = replaceCustome(dynSentence);
+
         // 异常情况终止循环
         int endNum = 0;
         foreach(DataCollectItem item in list) {
@@ -682,6 +684,12 @@ public class DataCollectServices : IDataCollectServices {
         }
         return dynSentence;
     }
+
+    private string replaceCustome(string dynSentence)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// 手动将DataTable 转化为Json
     /// </summary>

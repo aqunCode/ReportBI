@@ -69,7 +69,9 @@ public class UserController : BaseController
         currentUser.LastPasswordChangeTime = user.LastPasswordChangeTime;
 
         var retval = currentUser.MapTo<CurrentUserResponse>();
-        if (currentUser.LastPasswordChangeTime != null)
+        // 因为使用的是OA密码，所以无需在BI修改密码
+        retval.NeedChangePassword = false;
+        /*if (currentUser.LastPasswordChangeTime != null)
         {
             retval.NeedChangePassword = (System.DateTime.Now - currentUser.LastPasswordChangeTime.Value).TotalDays
                                         >
@@ -78,7 +80,7 @@ public class UserController : BaseController
         else
         {
             retval.NeedChangePassword = true;
-        }
+        }*/
 
         retval.VipLevel = await userServices.GetAndSetVipLevel(currentUser.Id);
         return this.Success(retval);
@@ -141,7 +143,7 @@ public class UserController : BaseController
     }
 
     /// <summary>
-    /// 添加用户信息
+    /// 修改用户信息
     /// </summary>
     /// <param name="fileName"></param>
     /// <returns></returns>

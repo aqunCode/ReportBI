@@ -78,3 +78,14 @@ public class UserInput : BaseInput
     public int IsAdministrator { get; set; }
 
 }
+
+public class UserPInput : BaseInput
+{
+    public string? Id { get; set; }
+
+    public string? NewPassword { get; set; }
+
+    public string? OldPassword { get; set; }
+}
+
+
