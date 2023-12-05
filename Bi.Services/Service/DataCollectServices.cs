@@ -263,7 +263,8 @@ public class DataCollectServices : IDataCollectServices {
         DateTime dt = System.DateTime.Now;
         DataCollect dataCollect = (await repository.Queryable<DataCollect>().Where(x => x.SetCode == input.SetCode && x.DeleteFlag == 0).ToListAsync()).FirstOrDefault();
         dataCollect = dataCollect ?? new DataCollect();
-        if ("sql" == (input.SetType.IsNull() ? dataCollect.SetType : input.SetType)) {
+        if ("sql" == (input.SetType.IsNull() ? dataCollect.SetType : input.SetType)) 
+        {
             //获取数据源
             List<DataSource> dataSources = await repository.Queryable<DataSource>().Where(x => x.SourceCode == (input.SourceCode??dataCollect.SourceCode)).ToListAsync();
             DataSource dataSource = dataSources.FirstOrDefault();
@@ -303,7 +304,9 @@ public class DataCollectServices : IDataCollectServices {
                 }
             }
                 
-        } else if("http" == (input.SetType.IsNull() ? dataCollect.SetType : input.SetType)) {
+        } 
+        else if("http" == (input.SetType.IsNull() ? dataCollect.SetType : input.SetType)) 
+        {
             int pageSize = input.LimitEnd - input.LimitStart;
             int pageIndex;
             if(pageSize == 0) {
@@ -502,8 +505,8 @@ public class DataCollectServices : IDataCollectServices {
         dynSentence = dynSentence.Replace("\r", " \r ").Replace("\n", " \n ");
         //添加空格避免解析出错
         dynSentence = dynSentence.Replace("(", " ( ").Replace(")", " ) ");
-        dynSentence = replaceCustome(dynSentence);
-
+        //dynSentence = replaceCustome(dynSentence);
+        
         // 异常情况终止循环
         int endNum = 0;
         foreach(DataCollectItem item in list) {

@@ -47,5 +47,16 @@ public class MachineOperateController : BaseController
             return Error();
     }
 
+    /// <summary>
+    /// 获取员工岗位
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("getPost")]
+    public async Task<ResponseResult> getPost(MachineOperateInput input)
+    {
+        return Success(await MachineOperateService.getPost(input));
+    }
 }
 

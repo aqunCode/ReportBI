@@ -18,6 +18,10 @@ public class MachineOperateInput : BaseInput
     /// </summary>
     public string? Name { get; set; }
     /// <summary>
+    /// 岗位
+    /// </summary>
+    public string? Post { get; set; }
+    /// <summary>
     /// mac地址
     /// </summary>
     public string? PhoneMac { get; set; }
