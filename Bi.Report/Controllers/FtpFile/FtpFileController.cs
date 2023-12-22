@@ -68,8 +68,8 @@ public class FtpFileController : BaseController {
     /// <returns></returns>
     [HttpGet]
     //[ActionName("showImage/{imageId}")]
-    [Route("showImage/{imageId}")]
-    public async Task<IActionResult> showImage(string imageId) 
+    [Route("downloadImage/{imageId}")]
+    public async Task<IActionResult> downloadImage(string imageId) 
     {
 
         string path = await services.showImage(imageId);
@@ -81,6 +81,34 @@ public class FtpFileController : BaseController {
             _ => "application/octet-stream" // 未知类型，默认为二进制流
         };
         return PhysicalFile(path, contentType, imageId);
+    }
+
+    /// <summary>
+    /// ftp 图片显示
+    /// </summary>
+    /// <param name="imageId"></param>
+    /// <returns></returns>
+    [HttpGet]
+    //[ActionName("showImage/{imageId}")]
+    [Route("showImage/{imageId}")]
+    public async Task<IActionResult> showImage(string imageId)
+    {
+
+        string path = await services.showImage(imageId);
+        var extension = System.IO.Path.GetExtension(imageId);
+        string contentType = extension switch
+        {
+            ".png" => "image/png",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            _ => "application/octet-stream" // 未知类型，默认为二进制流
+        };
+        using (var sw = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            var bytes = new byte[sw.Length];
+            sw.Read(bytes, 0, bytes.Length);
+            sw.Close();
+            return new FileContentResult(bytes, contentType);
+        }
     }
 
     /// <summary>

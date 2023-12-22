@@ -32,13 +32,13 @@ public class MachineOperateController : BaseController
     }
 
     /// <summary>
-    /// 添加操作信息
+    /// 员工上线操作
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
     [ActionName("insert")]
-    public async Task<ResponseResult> insert(MachineOperateInput input)
+    public async Task<ResponseResult> onLine(MachineOperateInput input)
     {
         var result = await MachineOperateService.addAsync(input);
         if (result > 0)
@@ -46,6 +46,22 @@ public class MachineOperateController : BaseController
         else
             return Error();
     }
+
+    /*/// <summary>
+    /// 员工上线操作
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ActionName("offLine")]
+    public async Task<ResponseResult> offLine(MachineOperateInput input)
+    {
+        var result = await MachineOperateService.updateAsync(input);
+        if (result > 0)
+            return Success();
+        else
+            return Error();
+    }*/
 
     /// <summary>
     /// 获取员工岗位
